@@ -1,0 +1,336 @@
+/* Stat cards */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-primary);
+}
+
+.stat-num.muted {
+  color: var(--text-secondary);
+}
+
+.stat-num.amber {
+  color: var(--amber);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.stat-label svg {
+  flex-shrink: 0;
+}
+
+/* Search */
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 160px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-input {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px 8px 32px;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--transition-base);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-input:focus {
+  border-color: rgba(201, 168, 76, 0.5);
+}
+
+/* Filter pills */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pill:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  color: var(--gold-light);
+}
+
+.pill.active {
+  background: rgba(139, 105, 20, 0.35);
+  color: var(--gold-light);
+  border-color: var(--gold-primary);
+}
+
+/* Sticker card */
+.sticker {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  border-radius: var(--radius-md);
+  padding: 10px 8px 8px;
+  position: relative;
+  text-align: center;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), opacity var(--transition-base);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sticker:hover {
+  border-color: rgba(201, 168, 76, 0.35);
+}
+
+.sticker.missing {
+  opacity: 0.45;
+  filter: grayscale(30%);
+}
+
+.sticker.missing:hover {
+  opacity: 0.65;
+}
+
+.sticker.pasted {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+  opacity: 1;
+  filter: none;
+}
+
+.sticker.fav {
+  border-color: rgba(201, 168, 76, 0.7);
+  background: rgba(201, 168, 76, 0.05);
+}
+
+.sticker.pasted.fav {
+  background: var(--green-bg);
+  border-color: rgba(201, 168, 76, 0.6);
+}
+
+.sticker-check {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  font-size: 9px;
+  color: var(--green-text);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sticker-star-btn {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+}
+
+.sticker-star-btn:hover {
+  transform: scale(1.25);
+}
+
+.sticker-star-btn .star-path {
+  fill: rgba(201,168,76,0.12);
+  stroke: rgba(201,168,76,0.35);
+  stroke-width: 1.8;
+  transition: fill var(--transition-fast), stroke var(--transition-fast);
+}
+
+.sticker-star-btn:hover .star-path {
+  fill: rgba(201,168,76,0.25);
+  stroke: rgba(201,168,76,0.7);
+}
+
+.sticker-star-btn.active .star-path {
+  fill: rgba(201,168,76,0.45);
+  stroke: #C9A84C;
+}
+
+.sticker-flag {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 5px;
+  pointer-events: none;
+}
+
+.sticker-flag-img {
+  display: block;
+  margin: 0 auto 5px;
+  width: 32px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.sticker-name {
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  margin-bottom: 3px;
+  pointer-events: none;
+}
+
+.sticker-name.owned {
+  color: var(--green-text);
+}
+
+.sticker-code {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--gold-dark);
+  display: block;
+  margin-bottom: 6px;
+  pointer-events: none;
+}
+
+/* Quantity control */
+.qty-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.qty-btn {
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  color: var(--gold-primary);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: var(--font-body);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.qty-btn:hover {
+  background: rgba(201, 168, 76, 0.2);
+  border-color: rgba(201, 168, 76, 0.4);
+}
+
+.qty-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  min-width: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Escudo sticker (team crest card) */
+.sticker-escudo {
+  border-color: rgba(201, 168, 76, 0.4);
+  background: rgba(201, 168, 76, 0.04);
+}
+
+.sticker-escudo.pasted {
+  background: var(--green-bg);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.sticker-escudo-img {
+  width: 40px !important;
+  height: 30px !important;
+  margin-bottom: 4px;
+}
+
+.sticker-escudo-name {
+  font-size: 8.5px;
+  font-weight: 600;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Special group (FWC / CC) cards */
+.sticker-special-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 5px;
+  pointer-events: none;
+}
+
+/* Hidden sticker in filter */
+.sticker[hidden],
+.team-block[hidden],
+.section[hidden] {
+  display: none;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .stat-num {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .sticker-flag {
+    font-size: 20px;
+  }
+
+  .sticker-name {
+    font-size: 8.5px;
+  }
+}

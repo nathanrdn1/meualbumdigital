@@ -1,0 +1,241 @@
+/* ── Modais genéricos ────────────────────────────────────── */
+
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('open');
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+/* ── Loading overlay ─────────────────────────────────────── */
+
+function showAppLoading(show) {
+  const el = document.getElementById('app-loading');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+/* ── FAB ─────────────────────────────────────────────────── */
+
+function toggleFabMenu() {
+  const menu = document.getElementById('fab-menu');
+  if (menu) menu.classList.toggle('open');
+}
+
+function closeFabMenu() {
+  const menu = document.getElementById('fab-menu');
+  if (menu) menu.classList.remove('open');
+}
+
+/* ── Undo ────────────────────────────────────────────────── */
+
+function performUndo() {
+  if (!canUndo()) { showToast('Nada para desfazer'); return; }
+  undoLast();
+  renderAll();
+  updateHeaderStats();
+  applyFilters();
+  showToast('↩ Ação desfeita');
+}
+
+// Ctrl+Z / Cmd+Z
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !isReadOnly) {
+    e.preventDefault();
+    performUndo();
+  }
+});
+
+/* ── Fluxo de autenticação ───────────────────────────────── */
+
+async function handleSignIn(user) {
+  setCurrentUser(user.uid);
+
+  let firestoreData = null;
+  try {
+    firestoreData = await fbLoadAlbum(user.uid);
+  } catch (err) {
+    console.error('[copa2026] Erro ao carregar álbum do Firestore:', err);
+  }
+
+  if (firestoreData === null) {
+    // Nenhum dado no Firestore — verificar migração do localStorage
+    const localData = getLocalRawState();
+    if (localData && Object.keys(localData).length > 0) {
+      loadStateFromObject(localData);
+      try {
+        await fbSaveAlbum(user.uid, localData);
+        clearLocalState();
+        showToast('✅ Coleção migrada para sua conta!');
+      } catch {
+        showToast('⚠️ Não foi possível migrar agora. Tentando novamente...');
+      }
+    } else {
+      loadStateFromObject({});
+    }
+  } else {
+    loadStateFromObject(firestoreData);
+  }
+
+  hideAuthModal();
+  renderAll();
+  updateHeaderStats();
+  applyFilters();
+}
+
+function handleSignOut() {
+  setCurrentUser(null);
+  loadStateFromObject({});
+  renderAll();
+  updateHeaderStats();
+  showAuthModal();
+}
+
+/* ── Binding de eventos ──────────────────────────────────── */
+
+function bindEvents() {
+  // Delegação de eventos do álbum
+  document.getElementById('main-content').addEventListener('click', e => {
+    if (isReadOnly) return;
+
+    const starBtn = e.target.closest('[data-star-id]');
+    if (starBtn) {
+      e.stopPropagation();
+      const id = starBtn.dataset.starId;
+      toggleFav(id);
+      updateStickerCard(id);
+      updateHeaderStats();
+      return;
+    }
+
+    const decBtn = e.target.closest('[data-dec]');
+    if (decBtn) {
+      e.stopPropagation();
+      const id = decBtn.dataset.dec;
+      decrementQty(id);
+      updateStickerCard(id);
+      updateTeamProgressById(id);
+      updateHeaderStats();
+      applyFilters();
+      return;
+    }
+
+    const incBtn = e.target.closest('[data-inc]');
+    if (incBtn) {
+      e.stopPropagation();
+      const id = incBtn.dataset.inc;
+      incrementQty(id);
+      updateStickerCard(id);
+      updateTeamProgressById(id);
+      updateHeaderStats();
+      applyFilters();
+      return;
+    }
+
+    const card = e.target.closest('.sticker[data-sticker-id]');
+    if (card) {
+      const id = card.dataset.stickerId;
+      toggleOwned(id);
+      updateStickerCard(id);
+      updateTeamProgressById(id);
+      updateHeaderStats();
+      applyFilters();
+    }
+  });
+
+  // Modais de exportação e compartilhamento
+  document.getElementById('export-copy-btn').addEventListener('click', copyExportList);
+  document.getElementById('export-download-btn').addEventListener('click', downloadExportList);
+  document.getElementById('export-close-btn').addEventListener('click', () => closeModal('export-modal'));
+  document.getElementById('share-copy-btn').addEventListener('click', copyShareLink);
+  document.getElementById('share-close-btn').addEventListener('click', () => closeModal('share-modal'));
+
+  // Fechar modal ao clicar no overlay
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+
+  // FAB
+  document.getElementById('fab-main').addEventListener('click', toggleFabMenu);
+
+  document.getElementById('fab-undo').addEventListener('click', () => {
+    closeFabMenu();
+    performUndo();
+  });
+
+  document.getElementById('fab-export').addEventListener('click', () => {
+    closeFabMenu();
+    openExportModal();
+  });
+
+  document.getElementById('fab-share').addEventListener('click', () => {
+    closeFabMenu();
+    openShareModal();
+  });
+
+  // Fechar FAB ao clicar fora
+  document.addEventListener('click', e => {
+    const fab = document.getElementById('fab-container');
+    if (fab && !fab.contains(e.target)) closeFabMenu();
+  });
+
+  // Banner de modo somente leitura
+  const createBtn = document.getElementById('create-collection-btn');
+  if (createBtn) createBtn.addEventListener('click', createOwnCollection);
+}
+
+/* ── Auxiliares de progresso ─────────────────────────────── */
+
+function updateTeamProgressById(stickerId) {
+  const parts = stickerId.split('-');
+  if (parts.length < 2) return;
+  const teamId = parts.slice(0, -1).join('-');
+  updateTeamProgress(teamId);
+}
+
+/* ── Inicialização ───────────────────────────────────────── */
+
+function init() {
+  // Modo de compartilhamento via URL — sem autenticação necessária
+  const shared = checkSharedUrl();
+  if (shared) {
+    showAppLoading(false);
+    renderAll();
+    updateHeaderStats();
+    initFilters();
+    bindEvents();
+    return;
+  }
+
+  // Modo normal — aguarda autenticação Firebase
+  initFilters();
+  bindEvents();
+
+  initAuth(
+    async user => {
+      await handleSignIn(user);
+      showAppLoading(false);
+    },
+    () => {
+      showAppLoading(false);
+      handleSignOut();
+    }
+  );
+}
+
+document.addEventListener('DOMContentLoaded', init);

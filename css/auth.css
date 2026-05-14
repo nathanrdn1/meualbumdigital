@@ -1,0 +1,369 @@
+/* ── Loading overlay (visível enquanto Firebase resolve auth) ── */
+
+#app-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.app-loading-trophy {
+  filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5));
+  animation: pulse-trophy 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-trophy {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.93); }
+}
+
+.app-loading-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+/* ── Auth overlay (tela de login/cadastro) ─────────────────── */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.auth-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  transform: translateY(24px);
+  transition: transform 0.3s ease;
+}
+
+.auth-overlay.open .auth-card {
+  transform: translateY(0);
+}
+
+/* Logo no topo do card */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.auth-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-logo-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-primary);
+  line-height: 1.1;
+}
+
+.auth-logo-sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Abas */
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-section);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+.auth-tab:hover {
+  color: var(--text-primary);
+}
+
+.auth-tab.active {
+  background: var(--bg-card);
+  color: var(--gold-primary);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+/* Campos do formulário */
+.auth-field {
+  margin-bottom: 14px;
+}
+
+.auth-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  font-family: var(--font-body);
+  letter-spacing: 0.3px;
+}
+
+.auth-field input {
+  width: 100%;
+  background: var(--bg-section);
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--transition-base);
+  box-sizing: border-box;
+}
+
+.auth-field input:focus {
+  border-color: rgba(201, 168, 76, 0.5);
+}
+
+.auth-field input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+/* Mensagem de erro */
+.auth-error {
+  font-size: 12px;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+/* Botão de submit */
+.auth-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary));
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bg-primary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: opacity var(--transition-base), transform var(--transition-fast);
+  margin-bottom: 10px;
+}
+
+.auth-submit:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.auth-submit:disabled,
+.auth-submit.loading {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Link "Esqueci a senha" */
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 0;
+  display: block;
+  text-align: center;
+  width: 100%;
+  transition: color var(--transition-base);
+}
+
+.auth-link:hover {
+  color: var(--gold-primary);
+}
+
+/* Divisor "ou" */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(201, 168, 76, 0.15);
+}
+
+.auth-divider span {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+/* Botão Google */
+.btn-google {
+  width: 100%;
+  background: var(--bg-section);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.btn-google:hover:not(:disabled) {
+  background: rgba(201, 168, 76, 0.07);
+  border-color: rgba(201, 168, 76, 0.4);
+}
+
+.btn-google:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Indicador do usuário logado (no header) ──────────────── */
+
+.user-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.18);
+  border: 1px solid var(--gold-primary);
+  color: var(--gold-primary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.user-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1;
+  font-family: var(--font-body);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-logout {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-body);
+  text-align: left;
+  line-height: 1;
+  transition: color var(--transition-fast);
+}
+
+.user-logout:hover {
+  color: var(--gold-primary);
+}
+
+/* ── Badge do botão Desfazer ──────────────────────────────── */
+
+.undo-badge {
+  display: none;
+  background: var(--gold-primary);
+  color: var(--bg-primary);
+  border-radius: 9px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  vertical-align: middle;
+  margin-left: 3px;
+  line-height: 1.4;
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 22px 18px;
+  }
+
+  .user-info {
+    display: none; /* Esconde nome/sair em telas muito pequenas, só avatar */
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+}

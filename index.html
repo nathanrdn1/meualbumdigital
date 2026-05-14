@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copa 2026 — Álbum de Figurinhas</title>
+  <meta name="description" content="Álbum digital de figurinhas da Copa do Mundo FIFA 2026" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+  <!-- ── Loading overlay (visível até Firebase resolver auth) ── -->
+  <div id="app-loading">
+    <svg class="app-loading-trophy" width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 3H4a2 2 0 000 4c0 2 1.5 3.5 3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M18 3h2a2 2 0 010 4c0 2-1.5 3.5-3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M6 3h12v9a6 6 0 01-12 0V3z" fill="rgba(201,168,76,0.25)" stroke="#C9A84C" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M10 18v2m4-2v2M8 22h8" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span class="app-loading-text">Carregando sua coleção…</span>
+  </div>
+
+  <!-- ── Modal de Login / Cadastro ─────────────────────────── -->
+  <div id="auth-modal" class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 3H4a2 2 0 000 4c0 2 1.5 3.5 3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M18 3h2a2 2 0 010 4c0 2-1.5 3.5-3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M6 3h12v9a6 6 0 01-12 0V3z" fill="rgba(201,168,76,0.25)" stroke="#C9A84C" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M10 18v2m4-2v2M8 22h8" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M10 9l1.5 1.5L14 7" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="auth-logo-text">
+          <div id="auth-modal-title" class="auth-logo-title">Copa 2026</div>
+          <div class="auth-logo-sub">Álbum de Figurinhas Digital</div>
+        </div>
+      </div>
+
+      <!-- Abas -->
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" data-tab="login" role="tab">Entrar</button>
+        <button class="auth-tab" data-tab="register" role="tab">Criar conta</button>
+      </div>
+
+      <!-- Formulário de login -->
+      <form id="login-form" autocomplete="on">
+        <div class="auth-field">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" type="email" autocomplete="email" placeholder="seu@email.com" required />
+        </div>
+        <div class="auth-field">
+          <label for="login-password">Senha</label>
+          <input id="login-password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+        </div>
+        <div id="login-error" class="auth-error" role="alert"></div>
+        <button type="submit" class="auth-submit" data-label="Entrar">Entrar</button>
+        <button type="button" id="forgot-password-btn" class="auth-link">Esqueci minha senha</button>
+      </form>
+
+      <!-- Formulário de cadastro -->
+      <form id="register-form" hidden autocomplete="on">
+        <div class="auth-field">
+          <label for="register-name">Nome</label>
+          <input id="register-name" type="text" autocomplete="name" placeholder="Seu nome" />
+        </div>
+        <div class="auth-field">
+          <label for="register-email">E-mail</label>
+          <input id="register-email" type="email" autocomplete="email" placeholder="seu@email.com" required />
+        </div>
+        <div class="auth-field">
+          <label for="register-password">Senha</label>
+          <input id="register-password" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required minlength="6" />
+        </div>
+        <div id="register-error" class="auth-error" role="alert"></div>
+        <button type="submit" class="auth-submit" data-label="Criar conta">Criar conta</button>
+      </form>
+
+      <!-- Divisor + Google -->
+      <div class="auth-divider"><span>ou</span></div>
+      <button id="google-signin-btn" class="btn-google" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continuar com Google
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ── Banner modo somente leitura ───────────────────────── -->
+  <div id="readonly-banner" class="readonly-banner" style="display:none" role="alert">
+    <span class="readonly-text">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-right:6px">
+        <path d="M12 5C7 5 3 12 3 12s4 7 9 7 9-7 9-7S17 5 12 5z" fill="rgba(201,168,76,0.2)" stroke="rgba(201,168,76,0.5)" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3" fill="#C9A84C"/>
+      </svg>
+      Você está vendo a coleção de outra pessoa
+    </span>
+    <button id="create-collection-btn" class="readonly-btn">Criar minha coleção</button>
+  </div>
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="header" role="banner">
+    <div class="header-logo">
+      <svg class="header-trophy" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 3H4a2 2 0 000 4c0 2 1.5 3.5 3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M18 3h2a2 2 0 010 4c0 2-1.5 3.5-3 4.2" stroke="rgba(201,168,76,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M6 3h12v9a6 6 0 01-12 0V3z" fill="rgba(201,168,76,0.25)" stroke="#C9A84C" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M10 18v2m4-2v2M8 22h8" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M10 9l1.5 1.5L14 7" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="header-title">Copa 2026</div>
+        <div class="header-subtitle">FIFA World Cup — USA · Canada · Mexico</div>
+      </div>
+    </div>
+
+    <!-- Indicador do usuário logado -->
+    <div id="user-indicator" class="user-indicator" style="display:none" aria-label="Usuário logado">
+      <div id="user-avatar" class="user-avatar" aria-hidden="true">??</div>
+      <div class="user-info">
+        <span id="user-name" class="user-name">Usuário</span>
+        <button id="logout-btn" class="user-logout">Sair</button>
+      </div>
+    </div>
+
+    <div class="header-progress" aria-label="Progresso geral do álbum">
+      <div class="header-progress-label">Progresso Geral</div>
+      <div id="progress-nums" class="header-progress-nums" aria-live="polite">0 / 0</div>
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <div id="progress-pct" class="progress-pct">0% completo</div>
+    </div>
+  </header>
+
+  <!-- ── Stats ──────────────────────────────────────────────── -->
+  <div class="stats-row" role="region" aria-label="Estatísticas">
+    <div class="stat-card">
+      <div id="stat-owned" class="stat-num gold" aria-live="polite">0</div>
+      <div class="stat-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="rgba(74,222,128,0.15)" stroke="rgba(74,222,128,0.35)" stroke-width="1.5"/>
+          <path d="M7 12l3.5 3.5L17 9" stroke="#4ADE80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Tenho
+      </div>
+    </div>
+    <div class="stat-card">
+      <div id="stat-missing" class="stat-num muted" aria-live="polite">0</div>
+      <div class="stat-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="3" fill="rgba(138,135,153,0.1)" stroke="rgba(138,135,153,0.4)" stroke-width="1.8"/>
+        </svg>
+        Faltam
+      </div>
+    </div>
+    <div class="stat-card">
+      <div id="stat-dupes" class="stat-num amber" aria-live="polite">0</div>
+      <div class="stat-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 8h11m0 0l-3-3m3 3l-3 3" stroke="rgba(245,158,11,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 16H9m0 0l3 3m-3-3l3-3" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Repetidas
+      </div>
+    </div>
+    <div class="stat-card">
+      <div id="stat-favs" class="stat-num gold" aria-live="polite">0</div>
+      <div class="stat-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2l2.9 6.1L22 9.2l-5 5 1.2 7L12 18l-6.2 3.2 1.2-7-5-5 7.1-1.1L12 2z" fill="rgba(201,168,76,0.3)" stroke="#C9A84C" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        Favoritas
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Controles ──────────────────────────────────────────── -->
+  <div class="controls" role="search">
+    <div class="search-wrap">
+      <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" fill="rgba(138,135,153,0.12)" stroke="rgba(138,135,153,0.5)" stroke-width="2"/>
+        <path d="M17 17l4 4" stroke="#8A8799" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        id="search-input"
+        class="search-input"
+        type="search"
+        placeholder="Buscar jogador, seleção ou código…"
+        aria-label="Buscar figurinha"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+    <div class="filters" role="group" aria-label="Filtros">
+      <button class="pill active" data-filter="all">Todas</button>
+      <button class="pill" data-filter="owned">Tenho</button>
+      <button class="pill" data-filter="missing">Faltam</button>
+      <button class="pill" data-filter="dupes">Repetidas</button>
+      <button class="pill" data-filter="favs">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2l2.9 6.1L22 9.2l-5 5 1.2 7L12 18l-6.2 3.2 1.2-7-5-5 7.1-1.1L12 2z" fill="rgba(201,168,76,0.3)" stroke="#C9A84C" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        Favoritas
+      </button>
+    </div>
+  </div>
+
+  <!-- Contador de resultados -->
+  <div id="results-counter" class="results-counter" role="status" aria-live="polite"></div>
+
+  <!-- ── Conteúdo principal ─────────────────────────────────── -->
+  <main id="main-content" class="main-content" role="main"></main>
+
+  <!-- Nenhum resultado -->
+  <div id="no-results" class="no-results" role="status">
+    Nenhuma figurinha encontrada com esses critérios.
+  </div>
+
+  <!-- ── Modal exportar repetidas ──────────────────────────── -->
+  <div id="export-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+    <div class="modal-card">
+      <div id="export-modal-title" class="modal-title">Suas repetidas para troca</div>
+      <div id="export-modal-sub" class="modal-sub">Lista gerada automaticamente</div>
+      <div class="modal-divider"></div>
+      <div id="export-modal-body" class="modal-body"></div>
+      <div class="modal-btns">
+        <button id="export-copy-btn" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="9" y="2" width="12" height="15" rx="2" fill="rgba(201,168,76,0.35)"/>
+            <rect x="3" y="7" width="12" height="15" rx="2" fill="#C9A84C"/>
+          </svg>
+          Copiar lista
+        </button>
+        <button id="export-download-btn" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 17h18v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2z" fill="rgba(201,168,76,0.35)"/>
+            <path d="M12 3v11m0 0l-4-4m4 4l4-4" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Baixar .txt
+        </button>
+        <button id="export-close-btn" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="rgba(138,135,153,0.15)"/>
+            <path d="M15 9l-6 6M9 9l6 6" stroke="#8A8799" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal compartilhar ─────────────────────────────────── -->
+  <div id="share-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+    <div class="modal-card">
+      <div id="share-modal-title" class="modal-title">Compartilhar coleção</div>
+      <div class="modal-sub">Envie este link para alguém ver sua coleção</div>
+      <div class="modal-divider"></div>
+      <div class="modal-body" style="flex:none;margin-bottom:16px">
+        <input
+          id="share-link"
+          type="text"
+          readonly
+          aria-label="Link para compartilhar"
+          style="width:100%;background:var(--bg-section);border:1px solid var(--gold-border);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--text-secondary);font-family:var(--font-mono);outline:none;word-break:break-all;"
+        />
+      </div>
+      <div class="modal-btns">
+        <button id="share-copy-btn" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="rgba(201,168,76,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Copiar link
+        </button>
+        <button id="share-close-btn" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="rgba(138,135,153,0.15)"/>
+            <path d="M15 9l-6 6M9 9l6 6" stroke="#8A8799" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FAB ────────────────────────────────────────────────── -->
+  <div id="fab-container" class="fab-container">
+    <div id="fab-menu" class="fab-menu">
+
+      <!-- Desfazer (desabilitado até haver histórico) -->
+      <div class="fab-action" id="fab-undo" style="opacity:0.4;pointer-events:none">
+        <span class="fab-action-label">
+          Desfazer
+          <span id="undo-badge" class="undo-badge">0</span>
+        </span>
+        <div class="fab-action-btn" aria-label="Desfazer última ação">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 10h10a7 7 0 110 14H8" stroke="rgba(201,168,76,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 10l4-4M3 10l4 4" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Exportar trocas -->
+      <div class="fab-action" id="fab-export">
+        <span class="fab-action-label">Exportar trocas</span>
+        <div class="fab-action-btn" aria-label="Exportar lista de trocas">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 16h10m0 0l-4-4m4 4l-4 4" stroke="rgba(201,168,76,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 8H7m0 0l4-4M7 8l4 4" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Compartilhar coleção -->
+      <div class="fab-action" id="fab-share">
+        <span class="fab-action-label">Compartilhar coleção</span>
+        <div class="fab-action-btn" aria-label="Compartilhar coleção">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" stroke="rgba(201,168,76,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 6l-4-4-4 4M12 2v13" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+    <button id="fab-main" class="fab" aria-label="Menu de ações" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="rgba(10,10,15,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M5 12h14" stroke="#0A0A0F" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M12 5v14" stroke="#0A0A0F" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────────────────── -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ── Scripts ────────────────────────────────────────────── -->
+
+  <!-- Firebase (compat SDK v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+  <!-- Configuração e inicialização do Firebase -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <!-- LZString para compartilhamento via URL -->
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+
+  <!-- Aplicação -->
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
