@@ -40,6 +40,14 @@ body {
   display: block;
 }
 
+.header-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(201, 168, 76, 0.3);
+  flex-shrink: 0;
+  margin: 0 14px;
+}
+
 .header-title {
   font-family: var(--font-display);
   font-weight: 700;
