@@ -156,7 +156,8 @@ function getStickerClass(s) {
 }
 
 function updateStickerCard(id) {
-  const card = document.querySelector(`[data-sticker-id="${id}"]`);
+  const main = document.getElementById('main-content');
+  const card = main?.querySelector(`[data-sticker-id="${id}"]`);
   if (!card) return;
 
   const s = getSticker(id);
