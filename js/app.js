@@ -185,7 +185,7 @@ function bindEvents() {
 
   document.getElementById('fab-share').addEventListener('click', () => {
     closeFabMenu();
-    openShareModal();
+    openShareModal(); // async — abre modal e preenche link em background
   });
 
   // Fechar FAB ao clicar fora
@@ -210,9 +210,9 @@ function updateTeamProgressById(stickerId) {
 
 /* ── Inicialização ───────────────────────────────────────── */
 
-function init() {
+async function init() {
   // Modo de compartilhamento via URL — sem autenticação necessária
-  const shared = checkSharedUrl();
+  const shared = await checkSharedUrl();
   if (shared) {
     showAppLoading(false);
     renderAll();
