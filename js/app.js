@@ -140,6 +140,7 @@ function bindEvents() {
       updateStickerCard(id);
       updateTeamProgressById(id);
       updateHeaderStats();
+      updateShowcaseCard(id);
       applyFilters();
       return;
     }
@@ -152,6 +153,7 @@ function bindEvents() {
       updateStickerCard(id);
       updateTeamProgressById(id);
       updateHeaderStats();
+      updateShowcaseCard(id);
       applyFilters();
       return;
     }
