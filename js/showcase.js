@@ -9,18 +9,24 @@ async function fetchWikiPlayerData(playerName) {
   if (_playerCache.has(playerName)) return _playerCache.get(playerName);
 
   try {
-    // Passo 1: artigo mais próximo via opensearch
-    const r1 = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(playerName)}&limit=1&format=json&origin=*`
-    );
-    const [, titles] = await r1.json();
-    if (!titles.length) { _playerCache.set(playerName, {}); return {}; }
+    // Passo 1: busca o artigo do jogador
+    // Prioriza "<nome> footballer" para evitar homônimos (políticos, atores, etc.)
+    // e só usa o nome simples como fallback se não encontrar resultado.
+    let articleTitle = null;
+    for (const query of [`${playerName} footballer`, playerName]) {
+      const r = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&format=json&origin=*`
+      );
+      const [, titles] = await r.json();
+      if (titles.length) { articleTitle = titles[0]; break; }
+    }
+    if (!articleTitle) { _playerCache.set(playerName, {}); return {}; }
 
     // Passo 2: foto do artigo Wikipedia + QID do jogador no Wikidata
     // A foto retornada é a imagem principal do artigo (foto de infobox do jogador).
     // Se não existir foto no Wikipedia, retorna null — não buscamos em outros sites.
     const r2 = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles[0])}&prop=pageimages|pageprops&format=json&pithumbsize=500&origin=*`
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(articleTitle)}&prop=pageimages|pageprops&format=json&pithumbsize=500&origin=*`
     );
     const d2   = await r2.json();
     const page = Object.values(d2.query.pages)[0];
