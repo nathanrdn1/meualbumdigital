@@ -48,6 +48,7 @@ function performUndo() {
   renderAll();
   updateHeaderStats();
   applyFilters();
+  updateShowcase();
   showToast('↩ Ação desfeita');
 }
 
@@ -102,6 +103,7 @@ async function handleSignIn(user) {
   renderAll();
   updateHeaderStats();
   applyFilters();
+  updateShowcase();
 }
 
 function handleSignOut() {
@@ -126,6 +128,7 @@ function bindEvents() {
       toggleFav(id);
       updateStickerCard(id);
       updateHeaderStats();
+      updateShowcase();
       return;
     }
 
