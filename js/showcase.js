@@ -3,24 +3,47 @@
 const _playerCache    = new Map(); // playerName → { url, age, clubName }
 let   _showcaseFavIds = new Set();
 
+/* ── Mapa de adjetivos de nacionalidade por seleção ─────── */
+
+const _NATIONALITY = {
+  MEX: 'Mexican',    RSA: 'South African', KOR: 'South Korean', CZE: 'Czech',
+  CAN: 'Canadian',   BIH: 'Bosnian',       QAT: 'Qatari',       SUI: 'Swiss',
+  BRA: 'Brazilian',  MAR: 'Moroccan',      HAI: 'Haitian',      SCO: 'Scottish',
+  USA: 'American',   PAR: 'Paraguayan',    AUS: 'Australian',   TUR: 'Turkish',
+  GER: 'German',     CUW: 'Curaçaoan',     CIV: 'Ivorian',      ECU: 'Ecuadorian',
+  NED: 'Dutch',      JPN: 'Japanese',      SWE: 'Swedish',      TUN: 'Tunisian',
+  BEL: 'Belgian',    EGY: 'Egyptian',      IRN: 'Iranian',      NZL: 'New Zealand',
+  ESP: 'Spanish',    CPV: 'Cape Verdean',  KSA: 'Saudi',        URU: 'Uruguayan',
+  FRA: 'French',     SEN: 'Senegalese',    IRQ: 'Iraqi',        NOR: 'Norwegian',
+  ARG: 'Argentine',  ALG: 'Algerian',      AUT: 'Austrian',     JOR: 'Jordanian',
+  POR: 'Portuguese', COD: 'Congolese',     UZB: 'Uzbek',        COL: 'Colombian',
+  ENG: 'English',    CRO: 'Croatian',      GHA: 'Ghanaian',     PAN: 'Panamanian',
+};
+
 /* ── API Wikipedia + Wikidata ────────────────────────────── */
 
-async function fetchWikiPlayerData(playerName) {
-  if (_playerCache.has(playerName)) return _playerCache.get(playerName);
+async function fetchWikiPlayerData(playerName, nationality = '') {
+  const cacheKey = `${playerName}|${nationality}`;
+  if (_playerCache.has(cacheKey)) return _playerCache.get(cacheKey);
 
   try {
-    // Passo 1: busca o artigo do jogador
-    // Prioriza "<nome> footballer" para evitar homônimos (políticos, atores, etc.)
-    // e só usa o nome simples como fallback se não encontrar resultado.
+    // Passo 1: busca o artigo do jogador em ordem de especificidade
+    // 1º: "<nome> <nacionalidade> footballer"  →  ex: "Rodrygo Brazilian footballer"
+    // 2º: "<nome> footballer"                  →  descarta homônimos não-futebolistas
+    // 3º: "<nome>" simples                     →  último recurso
+    const queries = nationality
+      ? [`${playerName} ${nationality} footballer`, `${playerName} footballer`, playerName]
+      : [`${playerName} footballer`, playerName];
+
     let articleTitle = null;
-    for (const query of [`${playerName} footballer`, playerName]) {
+    for (const query of queries) {
       const r = await fetch(
         `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&format=json&origin=*`
       );
       const [, titles] = await r.json();
       if (titles.length) { articleTitle = titles[0]; break; }
     }
-    if (!articleTitle) { _playerCache.set(playerName, {}); return {}; }
+    if (!articleTitle) { _playerCache.set(cacheKey, {}); return {}; }
 
     // Passo 2: foto do artigo Wikipedia + QID do jogador no Wikidata
     // A foto retornada é a imagem principal do artigo (foto de infobox do jogador).
@@ -79,10 +102,10 @@ async function fetchWikiPlayerData(playerName) {
     }
 
     const data = { url, age, clubName };
-    _playerCache.set(playerName, data);
+    _playerCache.set(cacheKey, data);
     return data;
   } catch {
-    _playerCache.set(playerName, {});
+    _playerCache.set(cacheKey, {});
     return {};
   }
 }
@@ -254,7 +277,8 @@ async function _loadShowcaseData(stickerId) {
     return;
   }
 
-  const wikiData = await fetchWikiPlayerData(player.name);
+  const nationality = _NATIONALITY[data.team.id] || '';
+  const wikiData = await fetchWikiPlayerData(player.name, nationality);
 
   if (!_findWrap()) return;
 
