@@ -1,6 +1,6 @@
 /* ── Cache de dados Wikipedia/Wikidata ───────────────────── */
 
-const _playerCache   = new Map(); // playerName → { url, age }
+const _playerCache    = new Map(); // playerName → { url, age, clubName, clubLogoUrl }
 let   _showcaseFavIds = new Set(); // IDs atualmente na vitrine
 
 /* ── API Wikipedia + Wikidata ────────────────────────────── */
@@ -16,7 +16,7 @@ async function fetchWikiPlayerData(playerName) {
     const [, titles] = await r1.json();
     if (!titles.length) { _playerCache.set(playerName, {}); return {}; }
 
-    // Passo 2: foto + QID do Wikidata em uma só chamada
+    // Passo 2: foto + QID Wikidata do jogador
     const r2 = await fetch(
       `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles[0])}&prop=pageimages|pageprops&format=json&pithumbsize=500&origin=*`
     );
@@ -25,17 +25,22 @@ async function fetchWikiPlayerData(playerName) {
     const url  = page?.thumbnail?.source ?? null;
     const qid  = page?.pageprops?.wikibase_item ?? null;
 
-    // Passo 3: data de nascimento pelo Wikidata (P569)
-    let age = null;
+    let age         = null;
+    let clubName    = null;
+    let clubLogoUrl = null;
+
     if (qid) {
       try {
+        // Passo 3: dados do jogador no Wikidata (nascimento P569 + clube atual P54)
         const r3 = await fetch(
           `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&props=claims&format=json&origin=*`
         );
-        const d3  = await r3.json();
-        const dob = d3.entities?.[qid]?.claims?.P569?.[0]?.mainsnak?.datavalue?.value?.time;
+        const d3     = await r3.json();
+        const claims = d3.entities?.[qid]?.claims;
+
+        // Idade a partir de P569 (data de nascimento)
+        const dob = claims?.P569?.[0]?.mainsnak?.datavalue?.value?.time;
         if (dob) {
-          // formato: +1995-02-12T00:00:00Z
           const year  = parseInt(dob.slice(1, 5),  10);
           const month = parseInt(dob.slice(6, 8),  10);
           const day   = parseInt(dob.slice(9, 11), 10);
@@ -43,10 +48,40 @@ async function fetchWikiPlayerData(playerName) {
           age = now.getFullYear() - year;
           if (now.getMonth() + 1 < month || (now.getMonth() + 1 === month && now.getDate() < day)) age--;
         }
-      } catch { /* age permanece null */ }
+
+        // Clube atual via P54 (membro de equipe esportiva)
+        // Clube atual = último sem data de término (P582)
+        const p54 = claims?.P54 || [];
+        let clubQid = null;
+        for (const c of p54) {
+          const hasEnd = !!(c.qualifiers?.P582);
+          if (!hasEnd && c.mainsnak?.snaktype === 'value') {
+            clubQid = c.mainsnak.datavalue.value.id; // sobrescreve → pega o mais recente
+          }
+        }
+
+        // Passo 4: nome + logo do clube via Wikidata (P154 = logo image)
+        if (clubQid) {
+          try {
+            const r4 = await fetch(
+              `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${clubQid}&props=labels|claims&languages=en&format=json&origin=*`
+            );
+            const d4   = await r4.json();
+            const club = d4.entities?.[clubQid];
+
+            clubName = club?.labels?.en?.value ?? null;
+
+            // Logo via P154 → Wikimedia Commons Special:FilePath
+            const logoFile = club?.claims?.P154?.[0]?.mainsnak?.datavalue?.value;
+            if (logoFile) {
+              clubLogoUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(logoFile)}`;
+            }
+          } catch { /* clube indisponível */ }
+        }
+      } catch { /* wikidata indisponível */ }
     }
 
-    const data = { url, age };
+    const data = { url, age, clubName, clubLogoUrl };
     _playerCache.set(playerName, data);
     return data;
   } catch {
@@ -136,13 +171,13 @@ function _createShowcaseCard(stickerId) {
   badge.className = 'showcase-flag-badge';
   if (flagUrl) {
     const bImg = document.createElement('img');
-    bImg.src     = flagUrl;
-    bImg.alt     = team.name;
+    bImg.src       = flagUrl;
+    bImg.alt       = team.name;
     bImg.className = 'showcase-flag-badge-img';
     badge.appendChild(bImg);
   } else {
     const bSpan = document.createElement('span');
-    bSpan.className = 'showcase-flag-badge-emoji';
+    bSpan.className   = 'showcase-flag-badge-emoji';
     bSpan.textContent = team.flag || '';
     badge.appendChild(bSpan);
   }
@@ -156,9 +191,10 @@ function _createShowcaseCard(stickerId) {
   const info = document.createElement('div');
   info.className = 'showcase-info';
 
-  /* Escudo circular do time */
+  /* Escudo do clube (placeholder: bandeira nacional; atualizado após fetch) */
   const crest = document.createElement('div');
   crest.className = 'showcase-crest';
+  crest.dataset.showcaseCrest = stickerId;
   if (flagUrl) {
     const cImg = document.createElement('img');
     cImg.src       = flagUrl;
@@ -206,7 +242,7 @@ function _createShowcaseCard(stickerId) {
   return card;
 }
 
-/* ── Carregamento assíncrono de foto + idade ─────────────── */
+/* ── Carregamento assíncrono de foto + idade + clube ─────── */
 
 async function _loadShowcaseData(stickerId) {
   const data = _findPlayerById(stickerId);
@@ -234,7 +270,7 @@ async function _loadShowcaseData(stickerId) {
     return;
   }
 
-  // Busca foto + idade
+  // Busca foto + idade + clube
   const wikiData = await fetchWikiPlayerData(player.name);
 
   // Card pode ter sido removido durante o await
@@ -251,10 +287,32 @@ async function _loadShowcaseData(stickerId) {
     if (fallback) fallback.style.display = 'flex';
   }
 
-  // Idade
+  // Idade — "25 anos"
   if (wikiData.age != null) {
     document.querySelectorAll('.showcase-age').forEach(el => {
-      if (el.dataset.showcaseAge === stickerId) el.textContent = `${wikiData.age}a`;
+      if (el.dataset.showcaseAge === stickerId) el.textContent = `${wikiData.age} anos`;
+    });
+  }
+
+  // Escudo do clube atual (substitui a bandeira nacional no crest)
+  if (wikiData.clubLogoUrl) {
+    document.querySelectorAll('.showcase-crest').forEach(crestEl => {
+      if (crestEl.dataset.showcaseCrest !== stickerId) return;
+      const existingImg = crestEl.querySelector('.showcase-crest-img');
+      if (existingImg) {
+        const newSrc = wikiData.clubLogoUrl;
+        existingImg.onerror = () => { /* mantém bandeira atual em caso de erro */ };
+        existingImg.src = newSrc;
+      }
+    });
+  }
+
+  // Atualiza title do card com nome do clube
+  if (wikiData.clubName) {
+    document.querySelectorAll('.showcase-card').forEach(cardEl => {
+      if (cardEl.dataset.stickerId === stickerId) {
+        cardEl.title = `${player.name} · ${wikiData.clubName}`;
+      }
     });
   }
 }
