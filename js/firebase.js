@@ -11,7 +11,7 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 /* ── Autenticação ─────────────────────────────────────────── */
 
 function fbSignInWithGoogle() {
-  return auth.signInWithPopup(googleProvider);
+  return auth.signInWithRedirect(googleProvider);
 }
 
 function fbSignInWithEmail(email, password) {
