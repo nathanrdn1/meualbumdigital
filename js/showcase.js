@@ -156,7 +156,14 @@ async function _loadShowcasePhoto(stickerId) {
   if (!data) return;
   const { player, group } = data;
 
-  const wrap = document.querySelector(`.showcase-photo-wrap[data-showcase-id="${CSS.escape(stickerId)}"]`);
+  const _findWrap = () => {
+    for (const w of document.querySelectorAll('.showcase-photo-wrap')) {
+      if (w.dataset.showcaseId === stickerId) return w;
+    }
+    return null;
+  };
+
+  const wrap = _findWrap();
   if (!wrap) return;
 
   const skeleton = wrap.querySelector('.showcase-skeleton');
@@ -173,8 +180,8 @@ async function _loadShowcasePhoto(stickerId) {
   // Busca foto na Wikipedia
   const url = await fetchWikiPhoto(player.name);
 
-  // Verifica se o card ainda existe
-  if (!document.querySelector(`.showcase-photo-wrap[data-showcase-id="${CSS.escape(stickerId)}"]`)) return;
+  // Verifica se o card ainda existe após o await
+  if (!_findWrap()) return;
 
   skeleton?.remove();
 
@@ -211,15 +218,12 @@ function updateShowcase() {
   const countEl = document.getElementById('showcase-count');
   if (countEl) countEl.textContent = favIds.length;
 
-  const newSet   = new Set(favIds);
+  const newSet    = new Set(favIds);
   const container = document.getElementById('showcase-cards');
 
-  // Remove cards desfavoritados
-  _showcaseFavIds.forEach(id => {
-    if (!newSet.has(id)) {
-      const card = container?.querySelector(`.showcase-card[data-sticker-id="${CSS.escape(id)}"]`);
-      card?.remove();
-    }
+  // Remove cards desfavoritados — percorre os cards existentes diretamente
+  container?.querySelectorAll('.showcase-card').forEach(card => {
+    if (!newSet.has(card.dataset.stickerId)) card.remove();
   });
 
   // Adiciona novos cards na posição correta (ordem do álbum)
