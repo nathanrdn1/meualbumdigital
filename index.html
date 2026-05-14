@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/modal.css" />
   <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/profile.css?v=1" />
 </head>
 <body>
 
@@ -132,7 +133,10 @@
 
     <!-- Indicador do usuário logado -->
     <div id="user-indicator" class="user-indicator" style="display:none" aria-label="Usuário logado">
-      <div id="user-avatar" class="user-avatar" aria-hidden="true">??</div>
+      <div id="user-avatar" class="user-avatar" aria-hidden="true" title="Ver perfil">
+        <img id="user-avatar-img" alt="Foto de perfil" />
+        <span id="user-avatar-initials">??</span>
+      </div>
       <div class="user-info">
         <span id="user-name" class="user-name">Usuário</span>
         <button id="logout-btn" class="user-logout">Sair</button>
@@ -350,6 +354,72 @@
     </button>
   </div>
 
+  <!-- ── Modal de perfil ───────────────────────────────────── -->
+  <div id="profile-modal" class="modal-overlay auth-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal-card profile-card auth-card">
+
+      <!-- Título -->
+      <div id="profile-modal-title" class="auth-logo-title" style="margin-bottom:4px">Meu Perfil</div>
+      <div class="auth-logo-sub" style="margin-bottom:16px">Personalize sua conta</div>
+      <div class="modal-divider"></div>
+
+      <!-- Foto de perfil -->
+      <div class="profile-photo-section">
+        <div class="profile-photo-wrap" id="profile-photo-wrap">
+          <img id="profile-photo-preview" class="profile-photo-img" alt="Foto de perfil" />
+          <div id="profile-photo-initials" class="profile-photo-initials">??</div>
+        </div>
+        <button class="profile-photo-btn" id="profile-photo-btn" type="button">Alterar foto</button>
+        <input type="file" id="profile-photo-input" accept="image/*" style="display:none" />
+      </div>
+
+      <!-- Mensagens -->
+      <div id="profile-error"   class="auth-error"      style="display:none"></div>
+      <div id="profile-success" class="profile-success" style="display:none"></div>
+
+      <!-- Dados pessoais -->
+      <div class="profile-section">
+        <div class="auth-field">
+          <label for="profile-name">Nome completo</label>
+          <input type="text" id="profile-name" placeholder="Seu nome" autocomplete="name" />
+        </div>
+        <div class="auth-field">
+          <label for="profile-apelido">
+            Apelido
+            <span class="profile-field-hint">(aparece no álbum)</span>
+          </label>
+          <input type="text" id="profile-apelido" placeholder="Como quer ser chamado?" maxlength="20" autocomplete="off" />
+        </div>
+        <div class="auth-field">
+          <label for="profile-email">E-mail</label>
+          <input type="email" id="profile-email" readonly class="profile-readonly" />
+        </div>
+        <button class="auth-submit" id="profile-save-btn" type="button" data-label="Salvar alterações">Salvar alterações</button>
+      </div>
+
+      <!-- Alterar senha (email/password users) -->
+      <div class="profile-section-divider"></div>
+      <div id="profile-password-section" class="profile-section">
+        <div class="profile-section-title">Alterar senha</div>
+        <div class="auth-field">
+          <label for="profile-password">Nova senha</label>
+          <input type="password" id="profile-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+        </div>
+        <div class="auth-field">
+          <label for="profile-password-confirm">Confirmar nova senha</label>
+          <input type="password" id="profile-password-confirm" placeholder="Repita a senha" autocomplete="new-password" />
+        </div>
+        <button class="auth-submit" id="profile-password-btn" type="button" data-label="Alterar senha">Alterar senha</button>
+      </div>
+      <div id="profile-google-note" class="profile-google-note" style="display:none">
+        Senha gerenciada pelo Google — não é possível alterar aqui.
+      </div>
+
+      <!-- Fechar -->
+      <button class="profile-close-btn" id="profile-close-btn" type="button">Fechar</button>
+    </div>
+  </div>
+
   <!-- ── Toast ──────────────────────────────────────────────── -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -375,6 +445,7 @@
   <script src="js/filters.js?v=2"></script>
   <script src="js/export.js?v=2"></script>
   <script src="js/share.js?v=2"></script>
+  <script src="js/profile.js?v=1"></script>
   <script src="js/app.js?v=2"></script>
 
 </body>

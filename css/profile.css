@@ -1,0 +1,220 @@
+/* ── Modal de perfil ─────────────────────────────────────── */
+
+#profile-modal {
+  align-items: center; /* centralizado, não bottom-sheet */
+}
+
+.profile-card {
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,0.3) transparent;
+}
+
+.profile-card::-webkit-scrollbar { width: 4px; }
+.profile-card::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+
+/* ── Foto de perfil ─────────────────────────────────────── */
+
+.profile-photo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 20px;
+}
+
+.profile-photo-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.15);
+  border: 2px solid var(--gold-primary);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition-base);
+}
+
+.profile-photo-wrap:hover {
+  border-color: var(--gold-light);
+}
+
+.profile-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.profile-photo-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-primary);
+  letter-spacing: 1px;
+}
+
+.profile-photo-btn {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: var(--radius-sm);
+  color: var(--gold-primary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 14px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.profile-photo-btn:hover {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--gold-primary);
+}
+
+/* ── Seções do formulário ───────────────────────────────── */
+
+.profile-section {
+  margin-bottom: 4px;
+}
+
+.profile-section-divider {
+  height: 1px;
+  background: rgba(201,168,76,0.12);
+  margin: 18px 0;
+}
+
+.profile-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+/* ── Campo readonly (email) ─────────────────────────────── */
+
+.profile-readonly {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Hint inline no label ───────────────────────────────── */
+
+.profile-field-hint {
+  font-weight: 400;
+  color: var(--gold-dark);
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+/* ── Mensagem de sucesso ────────────────────────────────── */
+
+.profile-success {
+  font-size: 12px;
+  color: var(--green-text);
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+/* ── Avatar no header clicável ──────────────────────────── */
+
+#user-avatar {
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  overflow: hidden;
+  position: relative;
+}
+
+#user-avatar:hover {
+  border-color: var(--gold-light);
+  transform: scale(1.08);
+}
+
+#user-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: none;
+}
+
+#user-avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.user-name {
+  cursor: pointer;
+}
+
+.user-name:hover {
+  color: var(--gold-primary);
+}
+
+/* ── Botão de fechar perfil ─────────────────────────────── */
+
+.profile-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 9px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  margin-top: 8px;
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+
+.profile-close-btn:hover {
+  border-color: rgba(255,255,255,0.18);
+  color: var(--text-primary);
+}
+
+/* ── Google user — oculta seção de senha ────────────────── */
+
+.profile-google-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 8px 0;
+  font-style: italic;
+}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .profile-card {
+    max-height: 95vh;
+  }
+  .profile-photo-wrap {
+    width: 68px;
+    height: 68px;
+  }
+  .profile-photo-initials {
+    font-size: 20px;
+  }
+}

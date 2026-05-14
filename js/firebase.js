@@ -53,6 +53,21 @@ function fbSaveAlbum(uid, state) {
   );
 }
 
+/* ── Firestore — perfil do usuário ───────────────────────── */
+
+// Coleção: users/{uid} → { apelido, photoBase64, updatedAt }
+async function fbLoadProfile(uid) {
+  const doc = await db.collection('users').doc(uid).get();
+  return doc.exists ? doc.data() : {};
+}
+
+function fbSaveProfile(uid, data) {
+  return db.collection('users').doc(uid).set(
+    { ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+    { merge: true }
+  );
+}
+
 /* ── Firestore — links de compartilhamento ────────────────── */
 
 const _SHORT_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';

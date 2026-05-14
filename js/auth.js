@@ -49,18 +49,30 @@ function setAuthError(errorId, msg) {
 
 /* ── Header — indicador do usuário logado ────────────────── */
 
-function updateUserHeader(user) {
-  const indicator = document.getElementById('user-indicator');
-  const avatar    = document.getElementById('user-avatar');
-  const nameEl    = document.getElementById('user-name');
+function updateUserHeader(user, profile = {}) {
+  const indicator  = document.getElementById('user-indicator');
+  const initialsEl = document.getElementById('user-avatar-initials');
+  const imgEl      = document.getElementById('user-avatar-img');
+  const nameEl     = document.getElementById('user-name');
   if (!indicator) return;
 
   if (user) {
-    const name     = user.displayName || user.email || 'Usuário';
-    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    const firstName = name.split(' ')[0];
-    if (avatar) avatar.textContent = initials;
-    if (nameEl)  nameEl.textContent = firstName;
+    const displayName = user.displayName || user.email || 'Usuário';
+    const initials    = displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const shownName   = profile.apelido || displayName.split(' ')[0];
+
+    if (nameEl) nameEl.textContent = shownName;
+
+    // Foto de perfil ou iniciais
+    if (profile.photoBase64 && imgEl && initialsEl) {
+      imgEl.src          = profile.photoBase64;
+      imgEl.style.display    = 'block';
+      initialsEl.style.display = 'none';
+    } else {
+      if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
+      if (imgEl)      imgEl.style.display = 'none';
+    }
+
     indicator.style.display = 'flex';
   } else {
     indicator.style.display = 'none';

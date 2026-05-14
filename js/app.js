@@ -64,12 +64,20 @@ document.addEventListener('keydown', e => {
 async function handleSignIn(user) {
   setCurrentUser(user.uid);
 
+  // Carrega perfil (apelido + foto) em paralelo com o álbum
   let firestoreData = null;
+  let userProfile   = {};
   try {
-    firestoreData = await fbLoadAlbum(user.uid);
+    [firestoreData, userProfile] = await Promise.all([
+      fbLoadAlbum(user.uid),
+      fbLoadProfile(user.uid),
+    ]);
   } catch (err) {
-    console.error('[copa2026] Erro ao carregar álbum do Firestore:', err);
+    console.error('[copa2026] Erro ao carregar dados do Firestore:', err);
+    try { firestoreData = await fbLoadAlbum(user.uid); } catch { /* noop */ }
   }
+
+  updateUserHeader(user, userProfile);
 
   if (firestoreData === null) {
     // Nenhum dado no Firestore — verificar migração do localStorage
@@ -225,6 +233,7 @@ async function init() {
   // Modo normal — aguarda autenticação Firebase
   initFilters();
   bindEvents();
+  bindProfileEvents();
 
   initAuth(
     async user => {
