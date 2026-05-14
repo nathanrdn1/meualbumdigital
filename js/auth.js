@@ -8,8 +8,8 @@ const FB_ERRORS = {
   'auth/invalid-email':         'E-mail inválido.',
   'auth/too-many-requests':     'Muitas tentativas. Tente novamente em alguns minutos.',
   'auth/network-request-failed':'Sem conexão. Verifique sua internet.',
-  'auth/cancelled-popup-request': '',
-  'auth/user-cancelled':        '',
+  'auth/popup-closed-by-user':  '',
+  'auth/popup-blocked':         'Pop-up bloqueado. Permita pop-ups para este site.',
 };
 
 function fbErrorMsg(code) {
@@ -126,24 +126,23 @@ function bindAuthEvents() {
     });
   }
 
-  /* Google — usa redirect (página navega para o Google e volta) */
+  /* Google */
   const googleBtn = document.getElementById('google-signin-btn');
   if (googleBtn) {
-    googleBtn.addEventListener('click', () => {
+    googleBtn.addEventListener('click', async () => {
       googleBtn.disabled = true;
-      googleBtn.textContent = 'Redirecionando…';
       setAuthError('login-error', '');
       setAuthError('register-error', '');
-      // signInWithRedirect navega para fora da página — erros voltam via getRedirectResult
-      fbSignInWithGoogle().catch(err => {
+      try {
+        await fbSignInWithGoogle();
+      } catch (err) {
         const msg = fbErrorMsg(err.code);
         if (msg) {
           setAuthError('login-error', msg);
           setAuthError('register-error', msg);
         }
         googleBtn.disabled = false;
-        googleBtn.textContent = 'Continuar com Google';
-      });
+      }
     });
   }
 
@@ -176,15 +175,6 @@ function bindAuthEvents() {
 
 function initAuth(onSignedIn, onSignedOut) {
   bindAuthEvents();
-
-  // Captura erros de redirecionamento Google (ex: conta recusada)
-  auth.getRedirectResult().catch(err => {
-    const msg = fbErrorMsg(err.code);
-    if (msg) {
-      setAuthError('login-error', msg);
-      setAuthError('register-error', msg);
-    }
-  });
 
   auth.onAuthStateChanged(async user => {
     if (user) {
