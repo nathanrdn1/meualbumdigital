@@ -52,3 +52,31 @@ function fbSaveAlbum(uid, state) {
     { merge: true }
   );
 }
+
+/* ── Firestore — links de compartilhamento ────────────────── */
+
+const _SHORT_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+
+function _generateShortId(length = 8) {
+  return Array.from({ length }, () =>
+    _SHORT_CHARS[Math.floor(Math.random() * _SHORT_CHARS.length)]
+  ).join('');
+}
+
+// Salva o estado no Firestore e retorna o ID curto gerado
+async function fbSaveShare(state) {
+  const shortId = _generateShortId();
+  await db.collection('shares').doc(shortId).set({
+    state,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: auth.currentUser ? auth.currentUser.uid : null,
+  });
+  return shortId;
+}
+
+// Carrega o estado a partir de um ID curto
+async function fbLoadShare(shortId) {
+  const doc = await db.collection('shares').doc(shortId).get();
+  if (!doc.exists) return null;
+  return doc.data().state || null;
+}
