@@ -57,15 +57,17 @@
   flex-shrink: 0;
   width: 130px;
   border-radius: var(--radius-md);
-  background: transparent;   /* fundo vem do ::after */
+  background: transparent;
   overflow: hidden;
   position: relative;
-  padding: 2px;              /* largura da borda animada */
+  padding: 2px;
   cursor: default;
+  /* Borda estática dourada em repouso */
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.45);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-/* ── Borda neon giratória ────────────────────────────────── */
+/* ── Borda neon giratória (visível só no hover) ───────────── */
 
 .showcase-card::before {
   content: '';
@@ -89,8 +91,10 @@
     rgba(201,168,76,.2) 357deg,
     transparent         360deg
   );
-  animation: showcase-neon-spin 3s linear infinite;
+  animation: showcase-neon-spin 2.5s linear infinite;
   will-change: transform;
+  opacity: 0;                         /* invisível em repouso */
+  transition: opacity 0.3s ease;
   z-index: 0;
 }
 
@@ -109,13 +113,13 @@
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Hover: sobe o card e acelera o neon */
+/* Hover: sobe, oculta borda estática, ativa neon */
 .showcase-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(201, 168, 76, 0.25);
+  box-shadow: 0 10px 28px rgba(201, 168, 76, 0.2); /* sombra suave, sem anel dourado */
 }
 .showcase-card:hover::before {
-  animation-duration: 1.2s;
+  opacity: 1; /* neon aparece */
 }
 
 /* Conteúdo acima dos pseudo-elementos */
@@ -225,13 +229,14 @@
   display: block;
 }
 
-/* ── Barra de info ───────────────────────────────────────── */
+/* ── Barra de info (altura fixa = mesma para todos os cards) */
 
 .showcase-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
   padding: 8px 8px 9px;
+  min-height: 58px;          /* acomoda 2 linhas de nome — uniformiza altura */
   background: linear-gradient(180deg, var(--bg-card) 0%, rgba(10,10,15,0.97) 100%);
   border-top: 1px solid rgba(201, 168, 76, 0.15);
   border-radius: 0 0 calc(var(--radius-md) - 2px) calc(var(--radius-md) - 2px);

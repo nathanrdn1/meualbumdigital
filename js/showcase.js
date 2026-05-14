@@ -16,7 +16,7 @@ async function fetchWikiPlayerData(playerName) {
     const [, titles] = await r1.json();
     if (!titles.length) { _playerCache.set(playerName, {}); return {}; }
 
-    // Passo 2: foto + QID Wikidata do jogador
+    // Passo 2: foto + QID do jogador
     const r2 = await fetch(
       `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles[0])}&prop=pageimages|pageprops&format=json&pithumbsize=500&origin=*`
     );
@@ -31,14 +31,14 @@ async function fetchWikiPlayerData(playerName) {
 
     if (qid) {
       try {
-        // Passo 3: dados do jogador no Wikidata (nascimento P569 + clube atual P54)
+        // Passo 3: Wikidata do jogador — nascimento (P569) + clube atual (P54)
         const r3 = await fetch(
           `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&props=claims&format=json&origin=*`
         );
         const d3     = await r3.json();
         const claims = d3.entities?.[qid]?.claims;
 
-        // Idade a partir de P569 (data de nascimento)
+        // Idade (P569 = data de nascimento)
         const dob = claims?.P569?.[0]?.mainsnak?.datavalue?.value?.time;
         if (dob) {
           const year  = parseInt(dob.slice(1, 5),  10);
@@ -49,32 +49,34 @@ async function fetchWikiPlayerData(playerName) {
           if (now.getMonth() + 1 < month || (now.getMonth() + 1 === month && now.getDate() < day)) age--;
         }
 
-        // Clube atual via P54 (membro de equipe esportiva)
-        // Clube atual = último sem data de término (P582)
+        // Clube atual (P54 sem data de término P582)
         const p54 = claims?.P54 || [];
         let clubQid = null;
         for (const c of p54) {
-          const hasEnd = !!(c.qualifiers?.P582);
-          if (!hasEnd && c.mainsnak?.snaktype === 'value') {
-            clubQid = c.mainsnak.datavalue.value.id; // sobrescreve → pega o mais recente
+          if (!c.qualifiers?.P582 && c.mainsnak?.snaktype === 'value') {
+            clubQid = c.mainsnak.datavalue.value.id; // sobrescreve → mais recente
           }
         }
 
-        // Passo 4: nome + logo do clube via Wikidata (P154 = logo image)
         if (clubQid) {
           try {
+            // Passo 4: nome + sitelink Wikipedia do clube via Wikidata
             const r4 = await fetch(
-              `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${clubQid}&props=labels|claims&languages=en&format=json&origin=*`
+              `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${clubQid}&props=labels|sitelinks&languages=en&sitefilter=enwiki&format=json&origin=*`
             );
-            const d4   = await r4.json();
-            const club = d4.entities?.[clubQid];
+            const d4         = await r4.json();
+            const clubEntity = d4.entities?.[clubQid];
+            clubName         = clubEntity?.labels?.en?.value ?? null;
+            const clubTitle  = clubEntity?.sitelinks?.enwiki?.title ?? null;
 
-            clubName = club?.labels?.en?.value ?? null;
-
-            // Logo via P154 → Wikimedia Commons Special:FilePath
-            const logoFile = club?.claims?.P154?.[0]?.mainsnak?.datavalue?.value;
-            if (logoFile) {
-              clubLogoUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(logoFile)}`;
+            // Passo 5: logo do clube via Wikipedia pageimages (mesmo método da foto do jogador)
+            if (clubTitle) {
+              const r5 = await fetch(
+                `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(clubTitle)}&prop=pageimages&format=json&pithumbsize=120&origin=*`
+              );
+              const d5       = await r5.json();
+              const clubPage = Object.values(d5.query.pages)[0];
+              clubLogoUrl    = clubPage?.thumbnail?.source ?? null;
             }
           } catch { /* clube indisponível */ }
         }
@@ -191,7 +193,7 @@ function _createShowcaseCard(stickerId) {
   const info = document.createElement('div');
   info.className = 'showcase-info';
 
-  /* Escudo do clube (placeholder: bandeira nacional; atualizado após fetch) */
+  /* Escudo do clube (placeholder: bandeira nacional; substituído após fetch) */
   const crest = document.createElement('div');
   crest.className = 'showcase-crest';
   crest.dataset.showcaseCrest = stickerId;
@@ -263,17 +265,14 @@ async function _loadShowcaseData(stickerId) {
   const img      = wrap.querySelector('.showcase-img');
   const fallback = wrap.querySelector('.showcase-fallback');
 
-  // Escudo / especiais: fallback imediato
   if (!_isSearchable(player, group)) {
     skeleton?.remove();
     if (fallback) fallback.style.display = 'flex';
     return;
   }
 
-  // Busca foto + idade + clube
   const wikiData = await fetchWikiPlayerData(player.name);
 
-  // Card pode ter sido removido durante o await
   if (!_findWrap()) return;
 
   skeleton?.remove();
@@ -294,20 +293,17 @@ async function _loadShowcaseData(stickerId) {
     });
   }
 
-  // Escudo do clube atual (substitui a bandeira nacional no crest)
+  // Escudo do clube atual
   if (wikiData.clubLogoUrl) {
     document.querySelectorAll('.showcase-crest').forEach(crestEl => {
       if (crestEl.dataset.showcaseCrest !== stickerId) return;
-      const existingImg = crestEl.querySelector('.showcase-crest-img');
-      if (existingImg) {
-        const newSrc = wikiData.clubLogoUrl;
-        existingImg.onerror = () => { /* mantém bandeira atual em caso de erro */ };
-        existingImg.src = newSrc;
-      }
+      const crestImg = crestEl.querySelector('.showcase-crest-img');
+      if (crestImg) crestImg.src = wikiData.clubLogoUrl;
+      // Em caso de erro na imagem do clube, a bandeira nacional continua visível
     });
   }
 
-  // Atualiza title do card com nome do clube
+  // Atualiza tooltip com nome do clube
   if (wikiData.clubName) {
     document.querySelectorAll('.showcase-card').forEach(cardEl => {
       if (cardEl.dataset.stickerId === stickerId) {
@@ -317,7 +313,7 @@ async function _loadShowcaseData(stickerId) {
   }
 }
 
-/* ── Atualiza contador de repetidas de um card existente ──── */
+/* ── Atualiza contador de repetidas em tempo real ────────── */
 
 function updateShowcaseCard(stickerId) {
   const sticker = getSticker(stickerId);
@@ -332,12 +328,6 @@ function updateShowcaseCard(stickerId) {
 
 /* ── API pública ─────────────────────────────────────────── */
 
-/**
- * Atualiza a vitrine de favoritas de forma incremental:
- * - Adiciona cards novos
- * - Remove cards desfavoritados
- * - Não re-carrega fotos já buscadas
- */
 function updateShowcase() {
   const section = document.getElementById('showcase-section');
   if (!section) return;
@@ -357,14 +347,12 @@ function updateShowcase() {
   const newSet    = new Set(favIds);
   const container = document.getElementById('showcase-cards');
 
-  // Remove cards desfavoritados
   container?.querySelectorAll('.showcase-card').forEach(card => {
     if (!newSet.has(card.dataset.stickerId)) card.remove();
   });
 
-  // Adiciona novos cards na posição correta
   favIds.forEach((id, idx) => {
-    if (_showcaseFavIds.has(id)) return; // já existe
+    if (_showcaseFavIds.has(id)) return;
     const card = _createShowcaseCard(id);
     if (!card || !container) return;
 
