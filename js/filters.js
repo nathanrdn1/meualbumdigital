@@ -1,8 +1,10 @@
 let currentFilter = 'all';
 let currentSearch = '';
+let currentTeam   = '';
 let searchDebounceTimer = null;
 
 function initFilters() {
+  /* Pills de status */
   const pills = document.querySelectorAll('.pill');
   pills.forEach(pill => {
     pill.addEventListener('click', () => {
@@ -13,6 +15,7 @@ function initFilters() {
     });
   });
 
+  /* Campo de busca */
   const searchInput = document.getElementById('search-input');
   searchInput.addEventListener('input', () => {
     clearTimeout(searchDebounceTimer);
@@ -20,6 +23,36 @@ function initFilters() {
       currentSearch = searchInput.value.trim().toLowerCase();
       applyFilters();
     }, 200);
+  });
+
+  /* Seletor de seleção */
+  _initTeamFilter();
+}
+
+function _initTeamFilter() {
+  const sel = document.getElementById('team-filter');
+  if (!sel) return;
+
+  // Coleta times não-especiais e ordena por nome
+  const teams = [];
+  for (const g of ALBUM_DATA) {
+    if (g.special) continue;
+    for (const team of g.teams) {
+      teams.push({ id: team.id, name: team.name, flag: team.flag });
+    }
+  }
+  teams.sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+
+  teams.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value       = t.id;
+    opt.textContent = `${t.flag}  ${t.name}`;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener('change', () => {
+    currentTeam = sel.value;
+    applyFilters();
   });
 }
 
@@ -33,14 +66,21 @@ function applyFilters() {
 
     teamBlocks.forEach(block => {
       const teamId = block.dataset.teamId;
+
+      /* Filtro por seleção */
+      if (currentTeam && teamId !== currentTeam) {
+        block.hidden = true;
+        return;
+      }
+
       const cards = block.querySelectorAll('.sticker[data-sticker-id]');
       let teamVisible = false;
 
       cards.forEach(card => {
         const id = card.dataset.stickerId;
-        const s = getSticker(id);
+        const s  = getSticker(id);
         const playerName = card.dataset.playerName || '';
-        const teamName = card.dataset.teamName || '';
+        const teamName   = card.dataset.teamName   || '';
 
         let matchSearch = true;
         if (currentSearch) {
@@ -51,28 +91,16 @@ function applyFilters() {
 
         let matchFilter = true;
         switch (currentFilter) {
-          case 'owned':
-            matchFilter = s.owned;
-            break;
-          case 'missing':
-            matchFilter = !s.owned;
-            break;
-          case 'dupes':
-            matchFilter = s.qty > 1;
-            break;
-          case 'favs':
-            matchFilter = s.fav;
-            break;
-          default:
-            matchFilter = true;
+          case 'owned':   matchFilter = s.owned;    break;
+          case 'missing': matchFilter = !s.owned;   break;
+          case 'dupes':   matchFilter = s.qty > 1;  break;
+          case 'favs':    matchFilter = s.fav;      break;
+          default:        matchFilter = true;
         }
 
         const visible = matchSearch && matchFilter;
         card.hidden = !visible;
-        if (visible) {
-          teamVisible = true;
-          visibleCount++;
-        }
+        if (visible) { teamVisible = true; visibleCount++; }
       });
 
       block.hidden = !teamVisible;
@@ -89,8 +117,7 @@ function applyFilters() {
 function updateResultsCounter(count) {
   const el = document.getElementById('results-counter');
   if (!el) return;
-
-  if (currentFilter === 'all' && !currentSearch) {
+  if (currentFilter === 'all' && !currentSearch && !currentTeam) {
     el.textContent = '';
     return;
   }

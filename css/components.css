@@ -316,6 +316,54 @@
   display: none;
 }
 
+/* ── Filtro por seleção ──────────────────────────────────── */
+
+.team-filter-wrap {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.team-filter-icon {
+  position: absolute;
+  left: 10px;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.team-filter {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 8px 32px 8px 32px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-base);
+  font-family: inherit;
+}
+
+.team-filter:hover,
+.team-filter:focus {
+  border-color: rgba(201, 168, 76, 0.5);
+}
+
+.team-filter option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.team-filter-chevron {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
 /* Mobile adjustments */
 @media (max-width: 480px) {
   .stat-num {
