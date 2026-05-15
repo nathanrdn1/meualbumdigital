@@ -77,7 +77,6 @@ async function toggleFollow(uid, profile, btn) {
       btn.dataset.following = 'false';
       btn.textContent = 'Seguir';
       btn.classList.replace('social-btn-unfollow', 'social-btn-follow');
-      // Remove da lista de seguindo
       document.querySelector(`#social-following-list [data-uid="${uid}"]`)
         ?.closest('.social-friend-card')?.remove();
       _checkEmptyFollowing();
@@ -87,6 +86,19 @@ async function toggleFollow(uid, profile, btn) {
       btn.textContent = 'Seguindo';
       btn.classList.replace('social-btn-follow', 'social-btn-unfollow');
       await loadFollowingList();
+    }
+
+    // Se estiver visitando esse amigo agora, atualiza os stats do header imediatamente
+    if (_visitingUid === uid) {
+      const stats = await fbGetProfileStats(uid);
+      const figurinhasEl = document.getElementById('user-stat-figurinhas');
+      const currentFigs  = parseInt(figurinhasEl?.textContent || '0');
+      updateUserHeader(
+        { displayName: profile.apelido || 'Amigo', email: '' },
+        profile,
+        { figurinhas: currentFigs, ...stats },
+        false
+      );
     }
   } catch (err) {
     console.error('[social] Erro ao seguir/deixar de seguir:', err);
