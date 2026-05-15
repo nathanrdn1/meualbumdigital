@@ -66,11 +66,20 @@ async function checkSharedUrl() {
   const shortId = params.get('c');
   if (shortId) {
     try {
-      const state = await fbLoadShare(shortId);
-      if (!state) { showToast('⚠️ Link inválido ou expirado'); return false; }
-      loadStateFromObject(state);
+      const result = await fbLoadShare(shortId);
+      if (!result || !result.state) { showToast('⚠️ Link inválido ou expirado'); return false; }
+      loadStateFromObject(result.state);
       isReadOnly = true;
       showReadOnlyBanner();
+
+      if (result.uid) {
+        try {
+          const profile = await fbLoadProfile(result.uid);
+          const mockUser = { displayName: profile.apelido || 'Colecionador', email: '' };
+          updateUserHeader(mockUser, profile);
+        } catch { /* noop */ }
+      }
+
       return true;
     } catch (err) {
       console.error('[share] Erro ao carregar link:', err);

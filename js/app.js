@@ -231,6 +231,7 @@ async function init() {
     updateHeaderStats();
     initFilters();
     bindEvents();
+    updateShowcase();
     return;
   }
 

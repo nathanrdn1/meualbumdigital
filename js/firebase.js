@@ -93,5 +93,5 @@ async function fbSaveShare(state) {
 async function fbLoadShare(shortId) {
   const doc = await db.collection('shares').doc(shortId).get();
   if (!doc.exists) return null;
-  return doc.data().state || null;
+  return { state: doc.data().state || null, uid: doc.data().uid || null };
 }
