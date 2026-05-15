@@ -145,34 +145,6 @@
   position: relative;
 }
 
-/* ── Badge bandeira (canto superior direito) ─────────────── */
-
-.showcase-flag-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 3;
-  width: 28px;
-  height: 20px;
-  border-radius: 3px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.18);
-}
-
-.showcase-flag-badge-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.showcase-flag-badge-emoji {
-  font-size: 15px;
-  line-height: 20px;
-  text-align: center;
-  display: block;
-}
-
 /* ── Bandeira centralizada ───────────────────────────────── */
 
 .showcase-body-flag {

@@ -52,22 +52,6 @@ function _createShowcaseCard(stickerId) {
   const body = document.createElement('div');
   body.className = 'showcase-body';
 
-  /* Badge bandeira — canto superior direito */
-  const badge = document.createElement('div');
-  badge.className = 'showcase-flag-badge';
-  if (flagUrl) {
-    const bImg = document.createElement('img');
-    bImg.src       = flagUrl;
-    bImg.alt       = team.name;
-    bImg.className = 'showcase-flag-badge-img';
-    badge.appendChild(bImg);
-  } else {
-    const bSpan = document.createElement('span');
-    bSpan.className   = 'showcase-flag-badge-emoji';
-    bSpan.textContent = team.flag || '';
-    badge.appendChild(bSpan);
-  }
-
   /* Bandeira centralizada (grande) */
   const flagWrap = document.createElement('div');
   flagWrap.className = 'showcase-body-flag';
@@ -89,7 +73,6 @@ function _createShowcaseCard(stickerId) {
   numEl.className   = 'showcase-num';
   numEl.textContent = `#${player.num}`;
 
-  body.appendChild(badge);
   body.appendChild(flagWrap);
   body.appendChild(numEl);
 
