@@ -81,10 +81,21 @@ function _generateShortId(length = 8) {
 // Salva o estado no Firestore e retorna o ID curto gerado
 async function fbSaveShare(state) {
   const shortId = _generateShortId();
+  const uid = auth.currentUser ? auth.currentUser.uid : null;
+
+  let ownerProfile = {};
+  if (uid) {
+    try { ownerProfile = await fbLoadProfile(uid); } catch { /* noop */ }
+  }
+
   await db.collection('shares').doc(shortId).set({
     state,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    uid: auth.currentUser ? auth.currentUser.uid : null,
+    uid,
+    ownerProfile: {
+      apelido:     ownerProfile.apelido     || '',
+      photoBase64: ownerProfile.photoBase64 || null,
+    },
   });
   return shortId;
 }
@@ -93,5 +104,9 @@ async function fbSaveShare(state) {
 async function fbLoadShare(shortId) {
   const doc = await db.collection('shares').doc(shortId).get();
   if (!doc.exists) return null;
-  return { state: doc.data().state || null, uid: doc.data().uid || null };
+  return {
+    state:        doc.data().state        || null,
+    uid:          doc.data().uid          || null,
+    ownerProfile: doc.data().ownerProfile || null,
+  };
 }

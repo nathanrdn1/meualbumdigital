@@ -72,14 +72,10 @@ async function checkSharedUrl() {
       isReadOnly = true;
       showReadOnlyBanner();
 
-      if (result.uid) {
-        try {
-          const profile = await fbLoadProfile(result.uid);
-          const mockUser = { displayName: profile.apelido || 'Colecionador', email: '' };
-          updateUserHeader(mockUser, profile);
-          document.getElementById('logout-btn')?.remove();
-        } catch { /* noop */ }
-      }
+      const profile  = result.ownerProfile || {};
+      const mockUser = { displayName: profile.apelido || 'Colecionador', email: '' };
+      updateUserHeader(mockUser, profile);
+      document.getElementById('logout-btn')?.remove();
 
       return true;
     } catch (err) {
