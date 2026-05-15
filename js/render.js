@@ -135,7 +135,7 @@ function createStickerCard(team, player, isSpecial) {
     </button>
     ${visualHtml}
     <div class="${nameClass}">${displayName}</div>
-    <span class="sticker-code">${id}</span>
+    <span class="sticker-code">${team.id}</span>
     <div class="qty-ctrl">
       <button class="qty-btn" aria-label="Diminuir quantidade de ${displayName}" data-dec="${id}">−</button>
       <span class="qty-num" data-qty="${id}">${s.qty}</span>

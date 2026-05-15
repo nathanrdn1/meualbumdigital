@@ -52,6 +52,7 @@ function _initTeamFilter() {
 
   sel.addEventListener('change', () => {
     currentTeam = sel.value;
+    sel.classList.toggle('active', !!currentTeam);
     applyFilters();
   });
 }

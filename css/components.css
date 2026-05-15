@@ -316,52 +316,79 @@
   display: none;
 }
 
-/* ── Filtro por seleção ──────────────────────────────────── */
+/* ── Filtro por seleção (pill inline) ────────────────────── */
 
 .team-filter-wrap {
-  width: 100%;
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .team-filter-icon {
   position: absolute;
-  left: 10px;
+  left: 9px;
   pointer-events: none;
+  color: var(--text-secondary);
   flex-shrink: 0;
+  transition: color var(--transition-base);
 }
 
 .team-filter {
-  width: 100%;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--bg-card);
+  background: transparent;
   border: 1px solid rgba(201, 168, 76, 0.2);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 13px;
-  padding: 8px 32px 8px 32px;
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 5px 22px 5px 26px;
   cursor: pointer;
   outline: none;
-  transition: border-color var(--transition-base);
-  font-family: inherit;
+  font-family: var(--font-body);
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 160px;
 }
 
-.team-filter:hover,
+.team-filter:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  color: var(--gold-light);
+}
+
 .team-filter:focus {
   border-color: rgba(201, 168, 76, 0.5);
+  color: var(--gold-light);
+}
+
+.team-filter.active {
+  background: rgba(139, 105, 20, 0.35);
+  color: var(--gold-light);
+  border-color: var(--gold-primary);
+}
+
+.team-filter-wrap:has(.team-filter.active) .team-filter-icon,
+.team-filter-wrap:has(.team-filter.active) .team-filter-chevron {
+  color: var(--gold-primary);
+}
+
+.team-filter-wrap:has(.team-filter:hover) .team-filter-icon,
+.team-filter-wrap:has(.team-filter:hover) .team-filter-chevron {
+  color: var(--gold-light);
 }
 
 .team-filter option {
-  background: var(--bg-card);
+  background: #141420;
   color: var(--text-primary);
 }
 
 .team-filter-chevron {
   position: absolute;
-  right: 10px;
+  right: 8px;
   pointer-events: none;
+  color: var(--text-secondary);
+  transition: color var(--transition-base);
 }
 
 /* Mobile adjustments */
