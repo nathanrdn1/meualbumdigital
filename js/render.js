@@ -219,6 +219,7 @@ function updateHeaderStats() {
   const progressPct = document.getElementById('progress-pct');
 
   if (ownedEl) ownedEl.textContent = stats.owned;
+  updateHeaderFigurinhas();
   if (missingEl) missingEl.textContent = stats.missing;
   if (dupesEl) dupesEl.textContent = stats.dupes;
   if (favsEl) favsEl.textContent = stats.favs;

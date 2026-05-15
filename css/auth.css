@@ -302,25 +302,70 @@
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+}
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .user-name {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   font-family: var(--font-body);
-  max-width: 80px;
+  max-width: 110px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.user-gear-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+  line-height: 1;
+}
+
+.user-gear-btn:hover { color: var(--gold-primary); }
+
+.user-social-stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.user-stat {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.user-stat strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.user-stat-sep {
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
 .user-logout {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 10px;
   cursor: pointer;
   padding: 0;

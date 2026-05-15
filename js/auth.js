@@ -49,11 +49,12 @@ function setAuthError(errorId, msg) {
 
 /* ── Header — indicador do usuário logado ────────────────── */
 
-function updateUserHeader(user, profile = {}) {
+function updateUserHeader(user, profile = {}, stats = null, ownProfile = false) {
   const indicator  = document.getElementById('user-indicator');
   const initialsEl = document.getElementById('user-avatar-initials');
   const imgEl      = document.getElementById('user-avatar-img');
   const nameEl     = document.getElementById('user-name');
+  const gearBtn    = document.getElementById('profile-gear-btn');
   if (!indicator) return;
 
   if (user) {
@@ -63,20 +64,36 @@ function updateUserHeader(user, profile = {}) {
 
     if (nameEl) nameEl.textContent = shownName;
 
+    // Engrenagem só aparece no próprio perfil
+    if (gearBtn) gearBtn.style.display = ownProfile ? 'flex' : 'none';
+
     // Foto de perfil ou iniciais
     if (profile.photoBase64 && imgEl && initialsEl) {
-      imgEl.src          = profile.photoBase64;
-      imgEl.style.display    = 'block';
+      imgEl.src                = profile.photoBase64;
+      imgEl.style.display      = 'block';
       initialsEl.style.display = 'none';
     } else {
       if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
       if (imgEl)      imgEl.style.display = 'none';
     }
 
+    // Stats sociais (figurinhas, seguidores, seguindo)
+    if (stats) {
+      const el = (id) => document.getElementById(id);
+      if (el('user-stat-figurinhas')) el('user-stat-figurinhas').textContent = stats.figurinhas ?? 0;
+      if (el('user-stat-seguidores')) el('user-stat-seguidores').textContent = stats.seguidores ?? 0;
+      if (el('user-stat-seguindo'))   el('user-stat-seguindo').textContent   = stats.seguindo   ?? 0;
+    }
+
     indicator.style.display = 'flex';
   } else {
     indicator.style.display = 'none';
   }
+}
+
+function updateHeaderFigurinhas() {
+  const el = document.getElementById('user-stat-figurinhas');
+  if (el) el.textContent = getStats().owned;
 }
 
 /* ── Binding dos eventos de auth ─────────────────────────── */

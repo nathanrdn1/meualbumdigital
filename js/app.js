@@ -78,7 +78,11 @@ async function handleSignIn(user) {
     try { firestoreData = await fbLoadAlbum(user.uid); } catch { /* noop */ }
   }
 
-  updateUserHeader(user, userProfile);
+  // Carrega stats sociais em paralelo
+  let socialStats = { seguidores: 0, seguindo: 0 };
+  try { socialStats = await fbGetProfileStats(user.uid); } catch { /* noop */ }
+
+  updateUserHeader(user, userProfile, { figurinhas: 0, ...socialStats }, true);
   setMyProfile(userProfile);
 
   // Garante que o apelido esteja registrado no índice de usernames
@@ -107,7 +111,8 @@ async function handleSignIn(user) {
 
   hideAuthModal();
   renderAll();
-  updateHeaderStats();
+  updateHeaderStats(); // atualiza figurinhas no header via updateHeaderFigurinhas()
+  setMySocialStats(socialStats);
   applyFilters();
   updateShowcase();
 }

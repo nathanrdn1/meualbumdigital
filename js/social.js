@@ -2,11 +2,13 @@
 
 let _myStateSnapshot  = null;
 let _myProfile        = {};
+let _mySocialStats    = { seguidores: 0, seguindo: 0 };
 let _savedLogoutBtn   = null;
 let _visitingUid      = null;
 let _socialPanelOpen  = false;
 
 function setMyProfile(profile) { _myProfile = profile || {}; }
+function setMySocialStats(stats) { _mySocialStats = stats || { seguidores: 0, seguindo: 0 }; }
 
 function isVisitingFriend() { return _visitingUid !== null; }
 function getMyStateSnapshot() { return _myStateSnapshot; }
@@ -235,11 +237,33 @@ async function visitFriendCollection(uid, profile) {
   const nameEl   = document.getElementById('user-name');
   if (avatarEl) { avatarEl.style.pointerEvents = 'none'; avatarEl.style.cursor = 'default'; }
   if (nameEl)   { nameEl.style.pointerEvents   = 'none'; nameEl.style.cursor   = 'default'; }
-  updateUserHeader({ displayName: profile.apelido || 'Amigo', email: '' }, profile);
 
+  // Carrega álbum e stats do amigo em paralelo
   try {
-    const friendState = await fbLoadFriendAlbum(uid);
+    const [friendState, friendStats] = await Promise.all([
+      fbLoadFriendAlbum(uid),
+      fbGetProfileStats(uid).catch(() => ({ seguidores: 0, seguindo: 0 })),
+    ]);
+
     loadStateFromObject(friendState);
+
+    // Conta figurinhas do amigo
+    let friendFigurinhas = 0;
+    for (const g of ALBUM_DATA) {
+      for (const team of g.teams) {
+        for (const player of team.players) {
+          if (friendState[`${team.id}-${player.num}`]?.owned) friendFigurinhas++;
+        }
+      }
+    }
+
+    updateUserHeader(
+      { displayName: profile.apelido || 'Amigo', email: '' },
+      profile,
+      { figurinhas: friendFigurinhas, ...friendStats },
+      false
+    );
+
     renderAll();
     updateHeaderStats();
     applyFilters();
@@ -266,7 +290,8 @@ function returnToMyCollection() {
   document.getElementById('fab-menu').style.display = '';
 
   // Restaura header com meu perfil e botão Sair
-  updateUserHeader(auth.currentUser, _myProfile);
+  updateUserHeader(auth.currentUser, _myProfile,
+    { figurinhas: getStats().owned, ..._mySocialStats }, true);
   const userInfo = document.querySelector('.user-info');
   if (_savedLogoutBtn && userInfo) { userInfo.appendChild(_savedLogoutBtn); _savedLogoutBtn = null; }
   const avatarEl = document.getElementById('user-avatar');

@@ -180,8 +180,23 @@
         <span id="user-avatar-initials">??</span>
       </div>
       <div class="user-info">
-        <span id="user-name" class="user-name">Usuário</span>
-        <button id="logout-btn" class="user-logout">Sair</button>
+        <div class="user-name-row">
+          <span id="user-name" class="user-name">Usuário</span>
+          <button id="profile-gear-btn" class="user-gear-btn" title="Configurações do perfil" style="display:none" aria-label="Configurações">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button id="logout-btn" class="user-logout">Sair</button>
+        </div>
+        <div class="user-social-stats">
+          <span class="user-stat"><strong id="user-stat-figurinhas">0</strong> figurinhas</span>
+          <span class="user-stat-sep">·</span>
+          <span class="user-stat"><strong id="user-stat-seguidores">0</strong> seguidores</span>
+          <span class="user-stat-sep">·</span>
+          <span class="user-stat"><strong id="user-stat-seguindo">0</strong> seguindo</span>
+        </div>
       </div>
     </div>
 

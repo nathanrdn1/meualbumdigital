@@ -96,17 +96,34 @@ function fbRemoveUsername(apelido) {
 
 /* ── Firestore — sistema de seguir ───────────────────────── */
 
-function fbFollowUser(myUid, theirUid, profileSnapshot) {
-  return db.collection('users').doc(myUid).collection('following').doc(theirUid).set({
-    uid:         theirUid,
-    apelido:     profileSnapshot.apelido     || '',
-    photoBase64: profileSnapshot.photoBase64 || null,
-    followedAt:  firebase.firestore.FieldValue.serverTimestamp(),
-  });
+async function fbFollowUser(myUid, theirUid, profileSnapshot) {
+  const batch = db.batch();
+  // Adiciona na lista de seguindo do usuário atual
+  batch.set(
+    db.collection('users').doc(myUid).collection('following').doc(theirUid),
+    { uid: theirUid, apelido: profileSnapshot.apelido || '', photoBase64: profileSnapshot.photoBase64 || null, followedAt: firebase.firestore.FieldValue.serverTimestamp() }
+  );
+  // Registra nos seguidores de quem foi seguido
+  batch.set(
+    db.collection('users').doc(theirUid).collection('followers').doc(myUid),
+    { uid: myUid, followedAt: firebase.firestore.FieldValue.serverTimestamp() }
+  );
+  return batch.commit();
 }
 
-function fbUnfollowUser(myUid, theirUid) {
-  return db.collection('users').doc(myUid).collection('following').doc(theirUid).delete();
+async function fbUnfollowUser(myUid, theirUid) {
+  const batch = db.batch();
+  batch.delete(db.collection('users').doc(myUid).collection('following').doc(theirUid));
+  batch.delete(db.collection('users').doc(theirUid).collection('followers').doc(myUid));
+  return batch.commit();
+}
+
+async function fbGetProfileStats(uid) {
+  const [followersSnap, followingSnap] = await Promise.all([
+    db.collection('users').doc(uid).collection('followers').get(),
+    db.collection('users').doc(uid).collection('following').get(),
+  ]);
+  return { seguidores: followersSnap.size, seguindo: followingSnap.size };
 }
 
 async function fbIsFollowing(myUid, theirUid) {

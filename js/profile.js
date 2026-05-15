@@ -242,10 +242,13 @@ function bindProfileEvents() {
   document.getElementById('profile-password-btn')
     ?.addEventListener('click', changePassword);
 
-  // Abrir perfil ao clicar no avatar ou nome (mas não no botão Sair)
+  // Abrir perfil ao clicar no avatar, nome ou engrenagem
   document.getElementById('user-avatar')
     ?.addEventListener('click', openProfileModal);
 
   document.getElementById('user-name')
+    ?.addEventListener('click', openProfileModal);
+
+  document.getElementById('profile-gear-btn')
     ?.addEventListener('click', openProfileModal);
 }
