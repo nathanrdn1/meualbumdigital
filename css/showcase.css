@@ -216,8 +216,8 @@
 .showcase-badge {
   display: none;
   position: absolute;
-  left: 8px;
-  bottom: 42px; /* sobre a linha body/info */
+  right: 8px;
+  top: 8px;
   width: 30px;
   height: 30px;
   border-radius: 50%;
