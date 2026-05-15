@@ -80,6 +80,11 @@ async function handleSignIn(user) {
 
   updateUserHeader(user, userProfile);
 
+  // Garante que o apelido esteja registrado no índice de usernames
+  if (userProfile.apelido) {
+    fbEnsureUsernameRegistered(userProfile.apelido, user.uid).catch(() => {});
+  }
+
   if (firestoreData === null) {
     // Nenhum dado no Firestore — verificar migração do localStorage
     const localData = getLocalRawState();

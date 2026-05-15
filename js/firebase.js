@@ -81,6 +81,14 @@ function fbRegisterUsername(apelido, uid) {
   return db.collection('usernames').doc(key).set({ uid, apelido: apelido.trim() });
 }
 
+// Registra o apelido no índice apenas se ainda não estiver cadastrado
+async function fbEnsureUsernameRegistered(apelido, uid) {
+  const existing = await fbLookupApelido(apelido);
+  if (!existing) {
+    await fbRegisterUsername(apelido, uid);
+  }
+}
+
 function fbRemoveUsername(apelido) {
   const key = apelido.trim().toLowerCase();
   return db.collection('usernames').doc(key).delete();
