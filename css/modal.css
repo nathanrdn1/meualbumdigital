@@ -191,6 +191,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
+  pointer-events: none;
 }
 
 .fab {
@@ -204,6 +205,7 @@
   box-shadow: 0 4px 20px var(--gold-glow);
   cursor: pointer;
   border: none;
+  pointer-events: all;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -233,6 +235,10 @@
   opacity: 1;
   pointer-events: all;
   transform: translateY(0);
+}
+
+.fab-menu.open .fab-action {
+  pointer-events: all;
 }
 
 .fab-action {
