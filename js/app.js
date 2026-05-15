@@ -104,9 +104,27 @@ async function handleSignIn(user) {
       }
     } else {
       loadStateFromObject({});
+      // Cria documento de álbum vazio para que o Firestore permita leituras sociais
+      fbSaveAlbum(user.uid, {}).catch(() => {});
     }
   } else {
     loadStateFromObject(firestoreData);
+  }
+
+  // Se o usuário não tem apelido, cria um padrão com base no nome e registra no índice
+  if (!userProfile.apelido) {
+    try {
+      const base     = (user.displayName || user.email?.split('@')[0] || 'usuario')
+                         .trim().split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      const exists   = await fbLookupApelido(base);
+      const apelido  = exists ? `${base}${user.uid.slice(0, 4)}` : base;
+      await fbSaveProfile(user.uid, { apelido });
+      await fbEnsureUsernameRegistered(apelido, user.uid);
+      userProfile    = { ...userProfile, apelido };
+      // Atualiza header com o apelido recém-criado
+      updateUserHeader(user, userProfile, { figurinhas: getStats().owned, ...socialStats }, true);
+      setMyProfile(userProfile);
+    } catch { /* noop — não bloqueia o carregamento */ }
   }
 
   hideAuthModal();

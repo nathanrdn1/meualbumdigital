@@ -253,7 +253,7 @@ async function visitFriendCollection(uid, profile) {
   // Carrega álbum e stats do amigo em paralelo
   try {
     const [friendState, friendStats] = await Promise.all([
-      fbLoadFriendAlbum(uid),
+      fbLoadFriendAlbum(uid).catch(() => ({})),  // novo usuário sem álbum → álbum vazio
       fbGetProfileStats(uid).catch(() => ({ seguidores: 0, seguindo: 0 })),
     ]);
 
