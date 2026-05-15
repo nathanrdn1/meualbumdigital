@@ -187,8 +187,7 @@ function bindEvents() {
   document.getElementById('fab-main').addEventListener('click', toggleFabMenu);
 
   document.getElementById('fab-undo').addEventListener('click', () => {
-    closeFabMenu();
-    performUndo();
+    performUndo(); // mantém o menu aberto para desfazer múltiplas ações
   });
 
   document.getElementById('fab-export').addEventListener('click', () => {
