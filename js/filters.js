@@ -168,11 +168,17 @@ function applyFilters() {
 
         let matchFilter = true;
         switch (currentFilter) {
-          case 'owned':   matchFilter = s.owned;    break;
-          case 'missing': matchFilter = !s.owned;   break;
-          case 'dupes':   matchFilter = s.qty > 1;  break;
-          case 'favs':    matchFilter = s.fav;      break;
-          default:        matchFilter = true;
+          case 'owned':        matchFilter = s.owned;    break;
+          case 'missing':      matchFilter = !s.owned;   break;
+          case 'dupes':        matchFilter = s.qty > 1;  break;
+          case 'favs':         matchFilter = s.fav;      break;
+          case 'friend-has': {
+            const mine = getMyStateSnapshot();
+            matchFilter = s.owned && !(mine?.[id]?.owned);
+            break;
+          }
+          case 'friend-dupes': matchFilter = s.qty > 1; break;
+          default:             matchFilter = true;
         }
 
         const visible = matchSearch && matchFilter;

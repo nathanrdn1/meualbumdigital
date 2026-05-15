@@ -1,6 +1,7 @@
 /* ── Estado local do perfil ──────────────────────────────── */
 
-let _pendingPhotoBase64 = null; // foto nova aguardando salvar
+let _pendingPhotoBase64 = null;
+let _loadedApelido      = '';
 
 /* ── Abrir / Fechar ──────────────────────────────────────── */
 
@@ -40,6 +41,7 @@ async function openProfileModal() {
     const apelidoEl = document.getElementById('profile-apelido');
     if (apelidoEl) apelidoEl.value = profile.apelido || '';
 
+    _loadedApelido = profile.apelido || '';
     if (profile.photoBase64) {
       _pendingPhotoBase64 = profile.photoBase64;
       _showPhotoPreview(profile.photoBase64);
@@ -47,6 +49,7 @@ async function openProfileModal() {
       _showInitialsPreview(user);
     }
   } catch {
+    _loadedApelido = '';
     _showInitialsPreview(user);
   }
 }
@@ -112,6 +115,17 @@ async function saveProfile() {
   _setBtnLoading(btn, true, 'Salvando…');
 
   try {
+    // Valida unicidade do apelido se foi alterado
+    const apelidoChanged = apelido.toLowerCase() !== _loadedApelido.toLowerCase();
+    if (apelido && apelidoChanged) {
+      const existing = await fbLookupApelido(apelido);
+      if (existing && existing.uid !== user.uid) {
+        _setProfileMsg('error', 'Este apelido já está em uso. Escolha outro.');
+        _setBtnLoading(btn, false, 'Salvar alterações');
+        return;
+      }
+    }
+
     // Atualiza displayName no Firebase Auth
     if (name !== (user.displayName || '')) {
       await auth.currentUser.updateProfile({ displayName: name });
@@ -121,6 +135,13 @@ async function saveProfile() {
     const data = { apelido };
     if (_pendingPhotoBase64) data.photoBase64 = _pendingPhotoBase64;
     await fbSaveProfile(user.uid, data);
+
+    // Atualiza índice de usernames
+    if (apelidoChanged) {
+      if (_loadedApelido) await fbRemoveUsername(_loadedApelido);
+      if (apelido)        await fbRegisterUsername(apelido, user.uid);
+      _loadedApelido = apelido;
+    }
 
     // Atualiza header imediatamente
     const profile = { apelido, photoBase64: _pendingPhotoBase64 || undefined };

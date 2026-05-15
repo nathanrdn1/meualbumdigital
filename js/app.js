@@ -239,13 +239,16 @@ async function init() {
   initFilters();
   bindEvents();
   bindProfileEvents();
+  bindSocialEvents();
 
   initAuth(
     async user => {
       await handleSignIn(user);
+      showSocialFab(true);
       showAppLoading(false);
     },
     () => {
+      showSocialFab(false);
       showAppLoading(false);
       handleSignOut();
     }

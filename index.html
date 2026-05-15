@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/auth.css" />
   <link rel="stylesheet" href="css/profile.css?v=1" />
   <link rel="stylesheet" href="css/showcase.css?v=10" />
+  <link rel="stylesheet" href="css/social.css" />
 </head>
 <body>
 
@@ -102,6 +103,46 @@
       </button>
 
     </div>
+  </div>
+
+  <!-- ── Overlay e painel social ──────────────────────────── -->
+  <div id="social-panel-overlay" class="social-panel-overlay"></div>
+  <div id="social-panel" class="social-panel" role="dialog" aria-label="Lista de amigos">
+    <div class="social-panel-header">
+      <span class="social-panel-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="9" cy="7" r="4" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="1.8"/>
+          <path d="M3 21c0-4 2.7-7 6-7h0c3.3 0 6 3 6 7" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M16 3.13a4 4 0 010 7.75M21 21c0-3.5-1.8-6.3-4.5-7" stroke="rgba(201,168,76,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Amigos
+      </span>
+      <button id="social-panel-close" class="social-panel-close" aria-label="Fechar painel">×</button>
+    </div>
+
+    <div class="social-search-wrap">
+      <input id="social-search-input" class="social-search-input" type="text"
+        placeholder="Buscar por apelido…" autocomplete="off" spellcheck="false" />
+      <button id="social-search-btn" class="social-search-submit">Buscar</button>
+    </div>
+    <div id="social-search-result" class="social-search-result"></div>
+
+    <div class="social-section-label">Seguindo</div>
+    <div id="social-following-list" class="social-following-list">
+      <span class="social-msg">Você ainda não segue ninguém.<br>Busque um apelido acima para começar.</span>
+    </div>
+  </div>
+
+  <!-- ── Banner de visita a amigo ──────────────────────────── -->
+  <div id="friend-banner" class="friend-banner" style="display:none" role="alert">
+    <span id="friend-banner-text" class="friend-banner-text">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="9" cy="7" r="4" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="1.8"/>
+        <path d="M3 21c0-4 2.7-7 6-7h0c3.3 0 6 3 6 7" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Vendo coleção de amigo
+    </span>
+    <button id="friend-back-btn" class="friend-back-btn">← Voltar</button>
   </div>
 
   <!-- ── Banner modo somente leitura ───────────────────────── -->
@@ -233,6 +274,8 @@
         </svg>
         Favoritas
       </button>
+      <button class="pill friend-filter-pill" data-filter="friend-has">Tem, eu não</button>
+      <button class="pill friend-filter-pill" data-filter="friend-dupes">Repetidas dele</button>
       <!-- Filtro por seleção (custom dropdown) -->
       <div class="team-filter-wrap" id="team-filter-wrap">
         <button class="pill team-filter-btn" id="team-filter-btn" type="button"
@@ -330,6 +373,15 @@
       </div>
     </div>
   </div>
+
+  <!-- ── FAB Social ───────────────────────────────────────────── -->
+  <button id="social-fab" class="fab social-fab" aria-label="Amigos" style="display:none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9" cy="7" r="4" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="1.8"/>
+      <path d="M3 21c0-4 2.7-7 6-7h0c3.3 0 6 3 6 7" stroke="#C9A84C" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M16 3.13a4 4 0 010 7.75M21 21c0-3.5-1.8-6.3-4.5-7" stroke="rgba(201,168,76,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
 
   <!-- ── FAB ────────────────────────────────────────────────── -->
   <div id="fab-container" class="fab-container">
@@ -473,6 +525,7 @@
   <script src="js/export.js?v=2"></script>
   <script src="js/share.js?v=2"></script>
   <script src="js/profile.js?v=1"></script>
+  <script src="js/social.js"></script>
   <script src="js/showcase.js?v=13"></script>
   <script src="js/app.js?v=4"></script>
 

@@ -68,6 +68,61 @@ function fbSaveProfile(uid, data) {
   );
 }
 
+/* ── Firestore — usernames únicos ────────────────────────── */
+
+async function fbLookupApelido(apelido) {
+  const key = apelido.trim().toLowerCase();
+  const doc = await db.collection('usernames').doc(key).get();
+  return doc.exists ? doc.data() : null;
+}
+
+function fbRegisterUsername(apelido, uid) {
+  const key = apelido.trim().toLowerCase();
+  return db.collection('usernames').doc(key).set({ uid, apelido: apelido.trim() });
+}
+
+function fbRemoveUsername(apelido) {
+  const key = apelido.trim().toLowerCase();
+  return db.collection('usernames').doc(key).delete();
+}
+
+/* ── Firestore — sistema de seguir ───────────────────────── */
+
+function fbFollowUser(myUid, theirUid, profileSnapshot) {
+  return db.collection('users').doc(myUid).collection('following').doc(theirUid).set({
+    uid:         theirUid,
+    apelido:     profileSnapshot.apelido     || '',
+    photoBase64: profileSnapshot.photoBase64 || null,
+    followedAt:  firebase.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+function fbUnfollowUser(myUid, theirUid) {
+  return db.collection('users').doc(myUid).collection('following').doc(theirUid).delete();
+}
+
+async function fbIsFollowing(myUid, theirUid) {
+  const doc = await db.collection('users').doc(myUid).collection('following').doc(theirUid).get();
+  return doc.exists;
+}
+
+async function fbGetFollowingList(myUid) {
+  const snap = await db.collection('users').doc(myUid)
+    .collection('following').orderBy('followedAt', 'desc').get();
+  return snap.docs.map(d => d.data());
+}
+
+async function fbLoadFriendAlbum(friendUid) {
+  const doc = await db.collection('albums').doc(friendUid).get();
+  if (!doc.exists) return {};
+  return doc.data().state || {};
+}
+
+async function fbGetUserProfile(uid) {
+  const doc = await db.collection('users').doc(uid).get();
+  return doc.exists ? doc.data() : {};
+}
+
 /* ── Firestore — links de compartilhamento ────────────────── */
 
 const _SHORT_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
