@@ -77,6 +77,7 @@ async function checkSharedUrl() {
           const profile = await fbLoadProfile(result.uid);
           const mockUser = { displayName: profile.apelido || 'Colecionador', email: '' };
           updateUserHeader(mockUser, profile);
+          document.getElementById('logout-btn')?.remove();
         } catch { /* noop */ }
       }
 
