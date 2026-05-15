@@ -106,10 +106,9 @@ function _createShowcaseCard(stickerId) {
   badge.className = `showcase-badge${sticker.qty > 0 ? ' has-qty' : ''}`;
   badge.dataset.showcaseBadge = stickerId;
   badge.innerHTML = `
-    <svg class="showcase-badge-check" width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg class="showcase-badge-check" width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M4 13l5 5L20 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <span class="showcase-badge-qty">${sticker.qty}</span>
   `;
 
   card.appendChild(body);
@@ -134,8 +133,6 @@ function updateShowcaseCard(stickerId) {
   document.querySelectorAll('.showcase-badge').forEach(el => {
     if (el.dataset.showcaseBadge === stickerId) {
       el.classList.toggle('has-qty', sticker.qty > 0);
-      const qtyEl = el.querySelector('.showcase-badge-qty');
-      if (qtyEl) qtyEl.textContent = sticker.qty;
     }
   });
 }
