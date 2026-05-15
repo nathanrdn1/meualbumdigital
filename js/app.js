@@ -79,6 +79,7 @@ async function handleSignIn(user) {
   }
 
   updateUserHeader(user, userProfile);
+  setMyProfile(userProfile);
 
   // Garante que o apelido esteja registrado no índice de usernames
   if (userProfile.apelido) {

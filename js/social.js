@@ -1,8 +1,12 @@
 /* ── Estado social ───────────────────────────────────────── */
 
 let _myStateSnapshot  = null;
+let _myProfile        = {};
+let _savedLogoutBtn   = null;
 let _visitingUid      = null;
 let _socialPanelOpen  = false;
+
+function setMyProfile(profile) { _myProfile = profile || {}; }
 
 function isVisitingFriend() { return _visitingUid !== null; }
 function getMyStateSnapshot() { return _myStateSnapshot; }
@@ -224,6 +228,15 @@ async function visitFriendCollection(uid, profile) {
   // Mostra filtros de comparação
   document.querySelectorAll('.friend-filter-pill').forEach(el => el.style.display = '');
 
+  // Atualiza header com perfil do amigo (remove Sair, desativa cliques)
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) { _savedLogoutBtn = logoutBtn; logoutBtn.remove(); }
+  const avatarEl = document.getElementById('user-avatar');
+  const nameEl   = document.getElementById('user-name');
+  if (avatarEl) { avatarEl.style.pointerEvents = 'none'; avatarEl.style.cursor = 'default'; }
+  if (nameEl)   { nameEl.style.pointerEvents   = 'none'; nameEl.style.cursor   = 'default'; }
+  updateUserHeader({ displayName: profile.apelido || 'Amigo', email: '' }, profile);
+
   try {
     const friendState = await fbLoadFriendAlbum(uid);
     loadStateFromObject(friendState);
@@ -251,6 +264,15 @@ function returnToMyCollection() {
   document.getElementById('friend-banner').style.display = 'none';
   document.getElementById('fab-main').style.display = '';
   document.getElementById('fab-menu').style.display = '';
+
+  // Restaura header com meu perfil e botão Sair
+  updateUserHeader(auth.currentUser, _myProfile);
+  const userInfo = document.querySelector('.user-info');
+  if (_savedLogoutBtn && userInfo) { userInfo.appendChild(_savedLogoutBtn); _savedLogoutBtn = null; }
+  const avatarEl = document.getElementById('user-avatar');
+  const nameEl   = document.getElementById('user-name');
+  if (avatarEl) { avatarEl.style.pointerEvents = ''; avatarEl.style.cursor = ''; }
+  if (nameEl)   { nameEl.style.pointerEvents   = ''; nameEl.style.cursor   = ''; }
 
   // Esconde filtros de comparação e reseta filtro ativo
   document.querySelectorAll('.friend-filter-pill').forEach(el => el.style.display = 'none');
