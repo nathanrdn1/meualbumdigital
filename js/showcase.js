@@ -129,6 +129,7 @@ function updateShowcase() {
 
   if (favIds.length === 0) {
     section.style.display = 'none';
+    container?.querySelectorAll('.showcase-card').forEach(c => c.remove());
     _showcaseFavIds.clear();
     return;
   }
@@ -147,7 +148,7 @@ function updateShowcase() {
 
   // Adiciona novos cards na posição correta
   favIds.forEach((id, idx) => {
-    if (_showcaseFavIds.has(id)) return;
+    if (container?.querySelector(`.showcase-card[data-sticker-id="${id}"]`)) return;
     const card = _createShowcaseCard(id);
     if (!card || !container) return;
 
