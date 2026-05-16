@@ -128,6 +128,7 @@ async function handleSignIn(user) {
   }
 
   hideAuthModal();
+  showSocialFab(true); // garante que o FAB aparece mesmo que o caller tenha um erro
   renderAll();
   updateHeaderStats(); // atualiza figurinhas no header via updateHeaderFigurinhas()
   setMySocialStats(socialStats);
@@ -272,7 +273,16 @@ async function init() {
 
   initAuth(
     async user => {
-      await handleSignIn(user);
+      try {
+        await handleSignIn(user);
+      } catch (err) {
+        // Garante que o app fique em estado utilizável mesmo em caso de erro inesperado
+        console.error('[copa2026] Erro ao inicializar sessão:', err);
+        try { hideAuthModal(); } catch { /* noop */ }
+        try { renderAll(); } catch { /* noop */ }
+      }
+      // Sempre exibe o FAB social para usuários autenticados,
+      // independente de qualquer erro em handleSignIn
       showSocialFab(true);
       showAppLoading(false);
     },
