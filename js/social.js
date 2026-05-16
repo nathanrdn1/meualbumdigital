@@ -26,6 +26,11 @@ function closeSocialPanel() {
   document.getElementById('social-panel')?.classList.remove('open');
   document.getElementById('social-panel-overlay')?.classList.remove('open');
   _socialPanelOpen = false;
+  // Limpa busca ao fechar o painel para não persistir entre sessões
+  const searchInput  = document.getElementById('social-search-input');
+  const searchResult = document.getElementById('social-search-result');
+  if (searchInput)  searchInput.value = '';
+  if (searchResult) searchResult.innerHTML = '';
 }
 
 function showSocialFab(visible) {
@@ -86,6 +91,14 @@ async function toggleFollow(uid, profile, btn) {
       btn.textContent = 'Seguindo';
       btn.classList.replace('social-btn-follow', 'social-btn-unfollow');
       await loadFollowingList();
+    }
+
+    // Se o botão está dentro do resultado de busca, limpa a busca após ação
+    const searchResult = document.getElementById('social-search-result');
+    if (searchResult?.contains(btn)) {
+      searchResult.innerHTML = '';
+      const searchInput = document.getElementById('social-search-input');
+      if (searchInput) searchInput.value = '';
     }
 
     // Se estiver visitando esse amigo agora, atualiza os stats do header imediatamente

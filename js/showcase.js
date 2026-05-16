@@ -143,7 +143,8 @@ function updateShowcase() {
   const section = document.getElementById('showcase-section');
   if (!section) return;
 
-  const favIds = _getAllFavIds();
+  const favIds    = _getAllFavIds();
+  const container = document.getElementById('showcase-cards');
 
   if (favIds.length === 0) {
     section.style.display = 'none';
@@ -156,8 +157,7 @@ function updateShowcase() {
   const countEl = document.getElementById('showcase-count');
   if (countEl) countEl.textContent = favIds.length;
 
-  const newSet    = new Set(favIds);
-  const container = document.getElementById('showcase-cards');
+  const newSet = new Set(favIds);
 
   // Remove cards desfavoritados
   container?.querySelectorAll('.showcase-card').forEach(card => {
