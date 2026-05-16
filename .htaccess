@@ -1,3 +1,6 @@
+# ── DirectoryIndex ────────────────────────────────────────────
+DirectoryIndex index.php index.html
+
 # ── Cache Control ────────────────────────────────────────────
 # HTML e PHP: nunca cacheados — o navegador sempre busca versão fresca
 <IfModule mod_headers.c>

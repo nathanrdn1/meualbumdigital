@@ -1,3 +1,13 @@
+<?php
+/**
+ * Helper: retorna o timestamp de modificação do arquivo como string de versão.
+ * Se o arquivo não existir, usa time() para forçar o bust.
+ */
+function v(string $path): string {
+  $full = __DIR__ . '/' . $path;
+  return (string)(file_exists($full) ? filemtime($full) : time());
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,15 +19,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/reset.css" />
-  <link rel="stylesheet" href="css/variables.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css?v=5" />
-  <link rel="stylesheet" href="css/modal.css" />
-  <link rel="stylesheet" href="css/auth.css" />
-  <link rel="stylesheet" href="css/profile.css?v=1" />
-  <link rel="stylesheet" href="css/showcase.css?v=10" />
-  <link rel="stylesheet" href="css/social.css" />
+  <link rel="stylesheet" href="css/reset.css?v=<?= v('css/reset.css') ?>" />
+  <link rel="stylesheet" href="css/variables.css?v=<?= v('css/variables.css') ?>" />
+  <link rel="stylesheet" href="css/layout.css?v=<?= v('css/layout.css') ?>" />
+  <link rel="stylesheet" href="css/components.css?v=<?= v('css/components.css') ?>" />
+  <link rel="stylesheet" href="css/modal.css?v=<?= v('css/modal.css') ?>" />
+  <link rel="stylesheet" href="css/auth.css?v=<?= v('css/auth.css') ?>" />
+  <link rel="stylesheet" href="css/profile.css?v=<?= v('css/profile.css') ?>" />
+  <link rel="stylesheet" href="css/showcase.css?v=<?= v('css/showcase.css') ?>" />
+  <link rel="stylesheet" href="css/social.css?v=<?= v('css/social.css') ?>" />
 </head>
 <body>
 
@@ -526,23 +536,23 @@
 
   <!-- Configuração e inicialização do Firebase -->
   <script src="js/firebase-config.php"></script>
-  <script src="js/firebase.js?v=2"></script>
+  <script src="js/firebase.js?v=<?= v('js/firebase.js') ?>"></script>
 
   <!-- LZString para compartilhamento via URL -->
   <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
   <!-- Aplicação -->
-  <script src="js/data.js?v=2"></script>
-  <script src="js/state.js?v=2"></script>
-  <script src="js/auth.js?v=2"></script>
-  <script src="js/render.js?v=4"></script>
-  <script src="js/filters.js?v=5"></script>
-  <script src="js/export.js?v=2"></script>
-  <script src="js/share.js?v=2"></script>
-  <script src="js/profile.js?v=1"></script>
-  <script src="js/social.js?v=2"></script>
-  <script src="js/showcase.js?v=13"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/data.js?v=<?= v('js/data.js') ?>"></script>
+  <script src="js/state.js?v=<?= v('js/state.js') ?>"></script>
+  <script src="js/auth.js?v=<?= v('js/auth.js') ?>"></script>
+  <script src="js/render.js?v=<?= v('js/render.js') ?>"></script>
+  <script src="js/filters.js?v=<?= v('js/filters.js') ?>"></script>
+  <script src="js/export.js?v=<?= v('js/export.js') ?>"></script>
+  <script src="js/share.js?v=<?= v('js/share.js') ?>"></script>
+  <script src="js/profile.js?v=<?= v('js/profile.js') ?>"></script>
+  <script src="js/social.js?v=<?= v('js/social.js') ?>"></script>
+  <script src="js/showcase.js?v=<?= v('js/showcase.js') ?>"></script>
+  <script src="js/app.js?v=<?= v('js/app.js') ?>"></script>
 
 </body>
 </html>
